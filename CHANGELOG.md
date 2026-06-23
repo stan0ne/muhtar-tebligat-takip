@@ -51,3 +51,5 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 ### Doğrulama
 - `flutter analyze`: 0 hata.
 - `flutter build windows --release`: başarılı (`build\windows\x64\runner\Release\muhtar_tebligat_takip.exe`).
+- EXE doğrudan çalıştırma + `flutter run -d windows --release`: uygulama açıldı, çökmedi.
+- Git: ilk commit `045eb1d` (`main` dalı).

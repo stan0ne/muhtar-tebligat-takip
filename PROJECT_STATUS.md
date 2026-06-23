@@ -5,7 +5,8 @@
 
 **Son güncelleme:** 2026-06-23
 **Sürüm:** 1.0.0
-**Durum:** ✅ Çalışır durumda — Windows release derlemesi üretildi.
+**Durum:** ✅ Çalışır durumda — Windows release derlemesi üretildi ve açılışı doğrulandı.
+**Git:** `045eb1d` — `feat: Muhtarlik Tebligat Takip Sistemi v1.0.0` (ilk commit, `main` dalı)
 
 ---
 
@@ -93,7 +94,10 @@
 | `flutter analyze` | ✅ 0 hata (8 info/uyarı) | 2026-06-23 |
 | `flutter build windows --release` | ✅ Başarılı | 2026-06-23 |
 | EXE üretildi | ✅ `build\windows\x64\runner\Release\muhtar_tebligat_takip.exe` | 2026-06-23 |
+| EXE doğrudan çalıştırma | ✅ Çökmedi, ayakta kaldı | 2026-06-23 |
+| `flutter run -d windows --release` | ✅ Uygulama açıldı (main/DB/seed admin/ekran) | 2026-06-23 |
 | İlk giriş (admin/admin) | ✅ Seed admin oluşturuluyor | 2026-06-23 |
+| Git ilk commit | ✅ `045eb1d` (main) | 2026-06-23 |
 
 ---
 
