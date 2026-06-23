@@ -1,0 +1,49 @@
+name: muhtar_tebligat_takip
+description: "Muhtarlık Tebligat Takip Sistemi"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Veritabanı (Windows desktop SQLite)
+  sqflite_common_ffi: ^2.3.3
+  path: ^1.9.0
+  path_provider: ^2.1.4
+
+  # Durum yönetimi
+  provider: ^6.1.2
+
+  # Ayar saklama
+  shared_preferences: ^2.3.2
+
+  # Şifre hashleme
+  crypto: ^3.0.5
+
+  # Excel içe/dışa aktarma
+  syncfusion_flutter_xlsio: ^27.1.48
+  excel: ^4.0.6
+
+  # PDF çıktı
+  pdf: ^3.11.1
+  printing: ^5.13.3
+
+  # Dosya seçimi (yedek geri yükleme, içe aktarma)
+  file_picker: ^8.1.2
+
+  # Tarih/format
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
