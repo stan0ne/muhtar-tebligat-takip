@@ -21,9 +21,12 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
   final _adCtrl = TextEditingController();
   final _sayiCtrl = TextEditingController();
   final _kurumCtrl = TextEditingController();
+  final _teslimAlanCtrl = TextEditingController();
+  final _telefonCtrl = TextEditingController();
   final _basCtrl = TextEditingController();
   final _sonCtrl = TextEditingController();
   String? _durum;
+  late String _hizliArama;
 
   List<Evrak> _items = [];
   int _total = 0;
@@ -36,7 +39,8 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
   @override
   void initState() {
     super.initState();
-    for (final c in [_adCtrl, _sayiCtrl, _kurumCtrl]) {
+    _hizliArama = widget.hizliArama;
+    for (final c in [_adCtrl, _sayiCtrl, _kurumCtrl, _teslimAlanCtrl, _telefonCtrl]) {
       c.addListener(_onChanged);
     }
     _search();
@@ -48,6 +52,8 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
     _adCtrl.dispose();
     _sayiCtrl.dispose();
     _kurumCtrl.dispose();
+    _teslimAlanCtrl.dispose();
+    _telefonCtrl.dispose();
     _basCtrl.dispose();
     _sonCtrl.dispose();
     super.dispose();
@@ -57,6 +63,7 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 350), () {
       _page = 1;
+      _hizliArama = '';
       _search();
     });
   }
@@ -64,17 +71,16 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
   Future<void> _search() async {
     setState(() => _loading = true);
     try {
-      final hizliArama = widget.hizliArama.isNotEmpty ? widget.hizliArama : null;
       final filter = EvrakFilter(
-        adSoyad: hizliArama == null && _adCtrl.text.trim().isNotEmpty
-            ? _adCtrl.text.trim()
-            : null,
+        adSoyad: _adCtrl.text.trim().isEmpty ? null : _adCtrl.text.trim(),
         evrakSayisi: _sayiCtrl.text.trim().isEmpty ? null : _sayiCtrl.text.trim(),
         geldigiKurum: _kurumCtrl.text.trim().isEmpty ? null : _kurumCtrl.text.trim(),
+        teslimAlan: _teslimAlanCtrl.text.trim().isEmpty ? null : _teslimAlanCtrl.text.trim(),
+        telefon: _telefonCtrl.text.trim().isEmpty ? null : _telefonCtrl.text.trim(),
         durum: _durum,
         tarihBaslangic: _basCtrl.text.isEmpty ? null : _basCtrl.text,
         tarihBitis: _sonCtrl.text.isEmpty ? null : _sonCtrl.text,
-        hizliArama: hizliArama,
+        hizliArama: _hizliArama.isNotEmpty ? _hizliArama : null,
       );
       final res = await Services.evrak.search(
           filter: filter, page: _page, pageSize: _pageSize);
@@ -119,9 +125,14 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
     _adCtrl.clear();
     _sayiCtrl.clear();
     _kurumCtrl.clear();
+    _teslimAlanCtrl.clear();
+    _telefonCtrl.clear();
     _basCtrl.clear();
     _sonCtrl.clear();
-    setState(() => _durum = null);
+    setState(() {
+      _durum = null;
+      _hizliArama = '';
+    });
     _page = 1;
     _search();
   }
@@ -168,6 +179,30 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
                   decoration: const InputDecoration(
                     labelText: 'Geldiği Kurum',
                     prefixIcon: Icon(Icons.account_balance),
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 200,
+                child: TextField(
+                  controller: _teslimAlanCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Teslim Alan',
+                    prefixIcon: Icon(Icons.how_to_reg),
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 160,
+                child: TextField(
+                  controller: _telefonCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Telefon',
+                    prefixIcon: Icon(Icons.phone),
                     isDense: true,
                     border: OutlineInputBorder(),
                   ),

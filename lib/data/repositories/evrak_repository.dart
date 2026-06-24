@@ -11,7 +11,9 @@ class EvrakFilter {
   final String? durum;
   final String? tarihBaslangic; // yyyy-MM-dd dahil
   final String? tarihBitis; // yyyy-MM-dd dahil
-  final String? hizliArama; // çoklu alan araması
+  final String? hizliArama; // çoklu alan araması (evrak + teslim alan)
+  final String? teslimAlan; // teslim alan kişi adı
+  final String? telefon; // teslim alan telefon
   final bool includeDeleted;
 
   const EvrakFilter({
@@ -22,6 +24,8 @@ class EvrakFilter {
     this.tarihBaslangic,
     this.tarihBitis,
     this.hizliArama,
+    this.teslimAlan,
+    this.telefon,
     this.includeDeleted = false,
   });
 
@@ -32,7 +36,9 @@ class EvrakFilter {
       (durum == null || durum!.isEmpty) &&
       (tarihBaslangic == null || tarihBaslangic!.isEmpty) &&
       (tarihBitis == null || tarihBitis!.isEmpty) &&
-      (hizliArama == null || hizliArama!.isEmpty);
+      (hizliArama == null || hizliArama!.isEmpty) &&
+      (teslimAlan == null || teslimAlan!.isEmpty) &&
+      (telefon == null || telefon!.isEmpty);
 
   EvrakFilter copyWith({
     String? adSoyad,
@@ -134,9 +140,30 @@ class EvrakRepository extends BaseRepository {
       final q = '%${filter.hizliArama}%';
       if (where.isNotEmpty) where.write(' AND ');
       where.write(
-        '(ad_soyad LIKE ? COLLATE NOCASE OR evrak_sayisi LIKE ? COLLATE NOCASE OR geldigi_kurum LIKE ? COLLATE NOCASE)',
+        '(ad_soyad LIKE ? COLLATE NOCASE'
+        ' OR evrak_sayisi LIKE ? COLLATE NOCASE'
+        ' OR geldigi_kurum LIKE ? COLLATE NOCASE'
+        ' OR EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = $_table.id'
+        '   AND (t.teslim_alan_ad_soyad LIKE ? COLLATE NOCASE'
+        '        OR t.telefon LIKE ? COLLATE NOCASE))',
       );
-      args.addAll([q, q, q]);
+      args.addAll([q, q, q, q, q]);
+    }
+    if (filter.teslimAlan != null && filter.teslimAlan!.isNotEmpty) {
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write(
+        'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = $_table.id'
+        ' AND t.teslim_alan_ad_soyad LIKE ? COLLATE NOCASE)',
+      );
+      args.add('%${filter.teslimAlan}%');
+    }
+    if (filter.telefon != null && filter.telefon!.isNotEmpty) {
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write(
+        'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = $_table.id'
+        ' AND t.telefon LIKE ? COLLATE NOCASE)',
+      );
+      args.add('%${filter.telefon}%');
     }
     addClause("durum = ?", filter.durum);
     if (filter.tarihBaslangic != null && filter.tarihBaslangic!.isNotEmpty) {
