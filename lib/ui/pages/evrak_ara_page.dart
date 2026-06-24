@@ -36,7 +36,6 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
   @override
   void initState() {
     super.initState();
-    _adCtrl.text = widget.hizliArama;
     for (final c in [_adCtrl, _sayiCtrl, _kurumCtrl]) {
       c.addListener(_onChanged);
     }
@@ -65,13 +64,17 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
   Future<void> _search() async {
     setState(() => _loading = true);
     try {
+      final hizliArama = widget.hizliArama.isNotEmpty ? widget.hizliArama : null;
       final filter = EvrakFilter(
-        adSoyad: _adCtrl.text.trim().isEmpty ? null : _adCtrl.text.trim(),
+        adSoyad: hizliArama == null && _adCtrl.text.trim().isNotEmpty
+            ? _adCtrl.text.trim()
+            : null,
         evrakSayisi: _sayiCtrl.text.trim().isEmpty ? null : _sayiCtrl.text.trim(),
         geldigiKurum: _kurumCtrl.text.trim().isEmpty ? null : _kurumCtrl.text.trim(),
         durum: _durum,
         tarihBaslangic: _basCtrl.text.isEmpty ? null : _basCtrl.text,
         tarihBitis: _sonCtrl.text.isEmpty ? null : _sonCtrl.text,
+        hizliArama: hizliArama,
       );
       final res = await Services.evrak.search(
           filter: filter, page: _page, pageSize: _pageSize);

@@ -11,6 +11,7 @@ class EvrakFilter {
   final String? durum;
   final String? tarihBaslangic; // yyyy-MM-dd dahil
   final String? tarihBitis; // yyyy-MM-dd dahil
+  final String? hizliArama; // çoklu alan araması
   final bool includeDeleted;
 
   const EvrakFilter({
@@ -20,6 +21,7 @@ class EvrakFilter {
     this.durum,
     this.tarihBaslangic,
     this.tarihBitis,
+    this.hizliArama,
     this.includeDeleted = false,
   });
 
@@ -29,7 +31,8 @@ class EvrakFilter {
       (geldigiKurum == null || geldigiKurum!.isEmpty) &&
       (durum == null || durum!.isEmpty) &&
       (tarihBaslangic == null || tarihBaslangic!.isEmpty) &&
-      (tarihBitis == null || tarihBitis!.isEmpty);
+      (tarihBitis == null || tarihBitis!.isEmpty) &&
+      (hizliArama == null || hizliArama!.isEmpty);
 
   EvrakFilter copyWith({
     String? adSoyad,
@@ -126,6 +129,14 @@ class EvrakRepository extends BaseRepository {
     }
     if (filter.geldigiKurum != null && filter.geldigiKurum!.isNotEmpty) {
       addClause("geldigi_kurum LIKE ? COLLATE NOCASE", '%${filter.geldigiKurum}%');
+    }
+    if (filter.hizliArama != null && filter.hizliArama!.isNotEmpty) {
+      final q = '%${filter.hizliArama}%';
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write(
+        '(ad_soyad LIKE ? COLLATE NOCASE OR evrak_sayisi LIKE ? COLLATE NOCASE OR geldigi_kurum LIKE ? COLLATE NOCASE)',
+      );
+      args.addAll([q, q, q]);
     }
     addClause("durum = ?", filter.durum);
     if (filter.tarihBaslangic != null && filter.tarihBaslangic!.isNotEmpty) {

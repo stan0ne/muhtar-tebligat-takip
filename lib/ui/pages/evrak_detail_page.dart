@@ -45,7 +45,7 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
       context: context,
       builder: (_) => TeslimDialog(evrakId: widget.evrakId),
     );
-    if (ok == true && mounted) _load();
+    if (ok == true && mounted) Navigator.of(context).pop(true);
   }
 
   Future<void> _arsivle() async {
@@ -143,9 +143,15 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
     final isBekleyen = e.durum == EvrakDurum.bekliyor;
     final isArsiv = e.durum == EvrakDurum.arsivlendi;
 
-    return CallbackShortcuts(
-      bindings: <ShortcutActivator, VoidCallback>{
-        const SingleActivator(LogicalKeyboardKey.escape): _goBack,
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          _goBack();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -259,9 +265,9 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
                         ),
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
-                        onPressed: Services.auth.currentUser?.isYonetici == true ? _sil : null,
+                        onPressed: _sil,
                         icon: const Icon(Icons.delete),
-                        label: const Text('Sil (Yönetici)'),
+                        label: const Text('Sil'),
                       ),
                     ],
                   ),

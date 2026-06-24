@@ -64,34 +64,6 @@ class _AyarlarPageState extends State<AyarlarPage> {
             ),
           ),
           const SizedBox(height: 16),
-          // --- Hesap / Parola ---
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Hesap', style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  ListTile(
-                    leading: const Icon(Icons.person),
-                    title: Text(app.user?.adSoyad ?? app.user?.kullaniciAdi ?? ''),
-                    subtitle: Text(
-                        'Kullanıcı: ${app.user?.kullaniciAdi ?? ""} • Rol: ${app.user?.rol ?? ""}'),
-                  ),
-                  if (isYonetici) ...[
-                    const Divider(),
-                    FilledButton.tonalIcon(
-                      onPressed: () => _showUserDialog(app.user!),
-                      icon: const Icon(Icons.key),
-                      label: const Text('Parola Değiştir'),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
           // --- Kullanıcı Yönetimi ---
           if (isYonetici)
             Card(

@@ -29,7 +29,10 @@ class _HomeShellState extends State<HomeShell> {
     super.dispose();
   }
 
-  void _goTo(MenuPage page) => setState(() => _selected = page);
+  void _goTo(MenuPage page) {
+    if (page != MenuPage.ara) _hizliAraCtrl.clear();
+    setState(() => _selected = page);
+  }
 
   Widget _pageFor(MenuPage page) {
     switch (page) {
