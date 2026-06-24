@@ -16,16 +16,52 @@ class AyarlarPage extends StatefulWidget {
 
 class _AyarlarPageState extends State<AyarlarPage> {
   List<User> _users = [];
+  final _muhtarlikAdiCtrl = TextEditingController();
+  final _muhtarAdSoyadCtrl = TextEditingController();
+  final _ilCtrl = TextEditingController();
+  final _ilceCtrl = TextEditingController();
+  bool _saving = false;
 
   @override
   void initState() {
     super.initState();
     _loadUsers();
+    _loadMuhtarlik();
+  }
+
+  @override
+  void dispose() {
+    _muhtarlikAdiCtrl.dispose();
+    _muhtarAdSoyadCtrl.dispose();
+    _ilCtrl.dispose();
+    _ilceCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUsers() async {
     final users = await Services.auth.listUsers();
     if (mounted) setState(() => _users = users);
+  }
+
+  Future<void> _loadMuhtarlik() async {
+    _muhtarlikAdiCtrl.text = await Services.settings.get('muhtarlik_adi') ?? '';
+    _muhtarAdSoyadCtrl.text = await Services.settings.get('muhtar_ad_soyad') ?? '';
+    _ilCtrl.text = await Services.settings.get('il') ?? '';
+    _ilceCtrl.text = await Services.settings.get('ilce') ?? '';
+  }
+
+  Future<void> _saveMuhtarlik() async {
+    setState(() => _saving = true);
+    await Services.settings.set('muhtarlik_adi', _muhtarlikAdiCtrl.text.trim());
+    await Services.settings.set('muhtar_ad_soyad', _muhtarAdSoyadCtrl.text.trim());
+    await Services.settings.set('il', _ilCtrl.text.trim());
+    await Services.settings.set('ilce', _ilceCtrl.text.trim());
+    if (mounted) {
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Muhtarlık bilgileri kaydedildi.')),
+      );
+    }
   }
 
   @override
@@ -58,6 +94,86 @@ class _AyarlarPageState extends State<AyarlarPage> {
                     ],
                     selected: {app.themeMode},
                     onSelectionChanged: (s) => app.setThemeMode(s.first),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // --- Muhtarlık Bilgileri ---
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Muhtarlık Bilgileri', style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _muhtarlikAdiCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Muhtarlık Adı',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: _muhtarAdSoyadCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Muhtar Adı Soyadı',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _ilCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'İl',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: _ilceCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'İlçe',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.icon(
+                      onPressed: _saving ? null : _saveMuhtarlik,
+                      icon: _saving
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.save),
+                      label: const Text('Kaydet'),
+                    ),
                   ),
                 ],
               ),

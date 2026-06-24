@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/app_provider.dart';
 import '../pages/dashboard_page.dart';
 import '../pages/evrak_form_page.dart';
 import '../pages/evrak_ara_page.dart';
@@ -22,6 +20,7 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   MenuPage _selected = MenuPage.dashboard;
   final _hizliAraCtrl = TextEditingController();
+  int _araKey = 0;
 
   @override
   void dispose() {
@@ -41,7 +40,7 @@ class _HomeShellState extends State<HomeShell> {
       case MenuPage.yeniEvrak:
         return const EvrakFormPage(key: ValueKey('yeniEvrak'));
       case MenuPage.ara:
-        return EvrakAraPage(hizliArama: _hizliAraCtrl.text, key: const ValueKey('ara'));
+        return EvrakAraPage(hizliArama: _hizliAraCtrl.text, key: ValueKey('ara-$_araKey'));
       case MenuPage.bekleyen:
         return const EvrakListePage.durumBekleyen(key: ValueKey('bekleyen'));
       case MenuPage.teslimEdilen:
@@ -61,14 +60,16 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _hizliAra() async {
     if (_hizliAraCtrl.text.trim().isEmpty) return;
-    setState(() => _selected = MenuPage.ara);
+    setState(() {
+      _araKey++;
+      _selected = MenuPage.ara;
+    });
+    _hizliAraCtrl.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    final app = context.watch<AppProvider>();
     final theme = Theme.of(context);
-    final user = app.user;
 
     return Scaffold(
       body: Row(
@@ -142,21 +143,6 @@ class _HomeShellState extends State<HomeShell> {
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Chip(
-                            avatar: const Icon(Icons.person, size: 18),
-                            label: Text(
-                              '${user?.adSoyad ?? user?.kullaniciAdi ?? ''} '
-                              '(${user?.rol ?? ""})',
-                            ),
-                          ),
-                          IconButton(
-                            tooltip: 'Çıkış',
-                            icon: const Icon(Icons.logout),
-                            onPressed: () async {
-                              await app.logout();
-                            },
                           ),
                         ],
                       ),

@@ -12,6 +12,31 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
 ---
 
+## [1.2.0] — 2026-06-24
+
+### Düzeltildi
+- **Hızlı arama sonuç güncellenmeme**: Aynı sayfada tekrar arama yapıldığında sonuçlar artık güncelleniyor (dinamik ValueKey ile rebuild).
+- **Hızlı arama sonrası temizlik**: Arama yapıldıktan sonra input alanı otomatik temizleniyor.
+- **SQL arama hatası**: `addClause` closure kaldırıldı, inline kod ile değiştirildi. Tablo adları doğrudan string olarak yazıldı.
+- **ESC tuşu ile geri dönüş**: `CallbackShortcuts` yerine `Focus(autofocus: true, onKeyEvent:)` kullanılarak düzeltildi.
+- **EvrakDetay sayfası geri dönüş**: AppBar geri butonu eklendi.
+- **Teslim Et sonrası dönüş**: Teslim işleminden sonra otomatik olarak ana sayfaya (liste) dönülüyor.
+- **Sil butonu aktif**: Tüm kullanıcılar için aktif, onay dialogu ile çalışıyor.
+- **Hızlı arama çoklu alan**: Ad Soyad, Evrak No, Geldiği Kurum, Teslim Alan Kişi ve Telefon alanlarında OR araması yapıyor.
+- **Evrak Ara filtreleri**: Teslim Alan ve Telefon filtreleri eklendi, filtre değişikliğinde canlı arama tetikleniyor, filtre temizlenince sonuçlar da temizleniyor.
+
+### Eklendi
+- **Muhtarlık bilgileri**: Ayarlar sayfasına Muhtarlık Adı, Muhtar Adı Soyadı, İl ve İlçe alanları eklendi (SharedPreferences ile kayıtlı).
+- **Dashboard footer**: Ana sayfada "%muhtarlık-adı% Muhtarlığı" şeklinde silik yazı gösteriliyor.
+- **Login ekranı kaldırıldı**: Uygulama doğrudan ana ekrana açılıyor.
+- **Kullanıcı bilgi alanı kaldırıldı**: Sağ üstteki kullanıcı simgesi ve çıkış butonu kaldırıldı.
+
+### Değişti
+- Hızlı arama alanı menü geçişlerinde otomatik temizleniyor
+- Ayarlar sayfasından Hesap bölümü kaldırıldı
+
+---
+
 ## [1.1.0] — 2026-06-24
 
 ### Düzeltildi
