@@ -120,49 +120,64 @@ class EvrakRepository extends BaseRepository {
     }
 
     bool hasVal(String? s) => s != null && s.isNotEmpty;
-    String toLower(String s) => s.toLowerCase();
+
+    // SQLite LOWER() Turkce karakterleri (İ, Ü, Ş, Ö, Ç, Ğ) kucultmez.
+    // SQL tarafinda REPLACE ile, Dart tarafinda toLowerTurkce ile cozuyoruz.
+    String toLowerTurkce(String s) => s
+        .replaceAll('İ', 'i')
+        .replaceAll('Ü', 'ü')
+        .replaceAll('Ş', 'ş')
+        .replaceAll('Ö', 'ö')
+        .replaceAll('Ç', 'ç')
+        .replaceAll('Ğ', 'ğ')
+        .toLowerCase();
+
+    // SQL icin: kolon adini Turkce kucultme ile sarmaliyoruz.
+    String tl(String col) =>
+        "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($col,"
+        "'İ','i'),'Ü','ü'),'Ş','ş'),'Ö','ö'),'Ç','ç'),'Ğ','ğ')";
 
     if (hasVal(filter.adSoyad)) {
       if (where.isNotEmpty) where.write(' AND ');
-      where.write('LOWER(ad_soyad) LIKE ?');
-      args.add('%${toLower(filter.adSoyad!)}%');
+      where.write('${tl("ad_soyad")} LIKE ?');
+      args.add('%${toLowerTurkce(filter.adSoyad!)}%');
     }
     if (hasVal(filter.evrakSayisi)) {
       if (where.isNotEmpty) where.write(' AND ');
-      where.write('LOWER(evrak_sayisi) LIKE ?');
-      args.add('%${toLower(filter.evrakSayisi!)}%');
+      where.write('${tl("evrak_sayisi")} LIKE ?');
+      args.add('%${toLowerTurkce(filter.evrakSayisi!)}%');
     }
     if (hasVal(filter.geldigiKurum)) {
       if (where.isNotEmpty) where.write(' AND ');
-      where.write('LOWER(geldigi_kurum) LIKE ?');
-      args.add('%${toLower(filter.geldigiKurum!)}%');
+      where.write('${tl("geldigi_kurum")} LIKE ?');
+      args.add('%${toLowerTurkce(filter.geldigiKurum!)}%');
     }
     if (hasVal(filter.teslimAlan)) {
       if (where.isNotEmpty) where.write(' AND ');
       where.write(
-        'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
-        ' AND LOWER(t.teslim_alan_ad_soyad) LIKE ?)',
+        "EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id"
+        " AND ${tl("t.teslim_alan_ad_soyad")} LIKE ?)",
       );
-      args.add('%${toLower(filter.teslimAlan!)}%');
+      args.add('%${toLowerTurkce(filter.teslimAlan!)}%');
     }
     if (hasVal(filter.telefon)) {
       if (where.isNotEmpty) where.write(' AND ');
       where.write(
-        'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
-        ' AND LOWER(t.telefon) LIKE ?)',
+        "EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id"
+        " AND ${tl("t.telefon")} LIKE ?)",
       );
-      args.add('%${toLower(filter.telefon!)}%');
+      args.add('%${toLowerTurkce(filter.telefon!)}%');
     }
     if (hasVal(filter.hizliArama)) {
-      final q = '%${toLower(filter.hizliArama!)}%';
+      final q = '%${toLowerTurkce(filter.hizliArama!)}%';
       if (where.isNotEmpty) where.write(' AND ');
       where.write('('
-          'LOWER(ad_soyad) LIKE ?'
-          ' OR LOWER(evrak_sayisi) LIKE ?'
-          ' OR LOWER(geldigi_kurum) LIKE ?'
+          '${tl("ad_soyad")} LIKE ?'
+          ' OR ${tl("evrak_sayisi")} LIKE ?'
+          ' OR ${tl("geldigi_kurum")} LIKE ?'
           ' OR EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
-          '   AND (LOWER(t.teslim_alan_ad_soyad) LIKE ?'
-          '        OR LOWER(t.telefon) LIKE ?))'
+          '   AND (${tl("t.teslim_alan_ad_soyad")} LIKE ?'
+          '        OR ${tl("t.telefon")} LIKE ?))'
           ')');
       args.addAll([q, q, q, q, q]);
     }

@@ -9,7 +9,7 @@ class UserRepository extends BaseRepository {
     final database = await db;
     final rows = await database.query(
       _table,
-      where: 'LOWER(kullanici_adi) = LOWER(?)',
+      where: 'kullanici_adi = ?',
       whereArgs: [adi],
       limit: 1,
     );
