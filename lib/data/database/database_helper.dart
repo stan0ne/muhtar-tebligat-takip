@@ -70,7 +70,28 @@ class DatabaseHelper {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     for (int v = oldVersion + 1; v <= newVersion; v++) {
-      // await _migrateToVx(db, v);
+      await _migrateToVx(db, v);
+    }
+  }
+
+  Future<void> _migrateToVx(Database db, int version) async {
+    switch (version) {
+      case 2:
+        // DurumGecmisleri tablosu ekle
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS DurumGecmisleri (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            evrak_id INTEGER NOT NULL,
+            eski_durum TEXT,
+            yeni_durum TEXT NOT NULL,
+            degisiklik_tarihi TEXT NOT NULL,
+            aciklama TEXT,
+            FOREIGN KEY (evrak_id) REFERENCES Evraklar(id) ON DELETE RESTRICT
+          )
+        ''');
+        await db.execute(
+            "CREATE INDEX IF NOT EXISTS idx_durum_gecmisi_evrak_id ON DurumGecmisleri(evrak_id);");
+        break;
     }
   }
 
@@ -159,6 +180,21 @@ class DatabaseHelper {
         deger TEXT
       )
     ''');
+
+    // --- DurumGecmisleri ---
+    await db.execute('''
+      CREATE TABLE DurumGecmisleri (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        evrak_id INTEGER NOT NULL,
+        eski_durum TEXT,
+        yeni_durum TEXT NOT NULL,
+        degisiklik_tarihi TEXT NOT NULL,
+        aciklama TEXT,
+        FOREIGN KEY (evrak_id) REFERENCES Evraklar(id) ON DELETE RESTRICT
+      )
+    ''');
+    await db.execute(
+        "CREATE INDEX idx_durum_gecmisi_evrak_id ON DurumGecmisleri(evrak_id);");
   }
 
   /// Veritabanını kapatır.

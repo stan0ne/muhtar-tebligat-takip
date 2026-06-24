@@ -3,13 +3,13 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'Muhtarlık Tebligat Takip Sistemi';
-  static const String appVersion = '1.2.0';
+  static const String appVersion = '1.3.0';
 
   /// Veritabanı dosya adı.
   static const String dbName = 'tebligat.db';
 
   /// Mevcut şema sürümü.
-  static const int dbVersion = 1;
+  static const int dbVersion = 2;
 
   /// Sayfalama için varsayılan sayfa boyutu.
   static const int defaultPageSize = 50;

@@ -4,6 +4,7 @@ import '../../core/constants.dart';
 import '../../core/date_util.dart';
 import '../../data/models/evrak.dart';
 import '../../data/models/teslim_kaydi.dart';
+import '../../data/models/durum_gecmisi.dart';
 import '../../services/log_service.dart';
 import '../widgets/ui_util.dart';
 import 'evrak_form_page.dart';
@@ -21,6 +22,7 @@ class EvrakDetailPage extends StatefulWidget {
 class _EvrakDetailPageState extends State<EvrakDetailPage> {
   Evrak? _evrak;
   List<TeslimKaydi> _teslim = [];
+  List<DurumGecmisi> _gecmis = [];
   bool _loading = true;
 
   @override
@@ -32,10 +34,12 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
   Future<void> _load() async {
     final e = await Services.evrak.getById(widget.evrakId, includeDeleted: true);
     final t = await Services.evrak.teslimKayitlari(widget.evrakId);
+    final g = await Services.evrak.durumGecmisi(widget.evrakId);
     if (!mounted) return;
     setState(() {
       _evrak = e;
       _teslim = t;
+      _gecmis = g;
       _loading = false;
     });
   }
@@ -236,6 +240,22 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
                       ),
                     ),
                   const SizedBox(height: 20),
+                  // --- Durum Geçmişi ---
+                  if (_gecmis.isNotEmpty) ...[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Durum Geçmişi',
+                          style: theme.textTheme.titleMedium),
+                    ),
+                    const SizedBox(height: 8),
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: _buildTimeline(theme),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
                   Wrap(
                     spacing: 12,
                     runSpacing: 8,
@@ -278,6 +298,96 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTimeline(ThemeData theme) {
+    return Column(
+      children: [
+        for (int i = 0; i < _gecmis.length; i++) ...[
+          _buildTimelineItem(theme, _gecmis[i], i < _gecmis.length - 1),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildTimelineItem(ThemeData theme, DurumGecmisi gecmis, bool showLine) {
+    final Color color;
+    final IconData icon;
+    switch (gecmis.yeniDurum) {
+      case EvrakDurum.bekliyor:
+        color = Colors.orange;
+        icon = Icons.pending;
+        break;
+      case EvrakDurum.teslimEdildi:
+        color = Colors.green;
+        icon = Icons.check_circle;
+        break;
+      case EvrakDurum.arsivlendi:
+        color = Colors.grey;
+        icon = Icons.archive;
+        break;
+      default:
+        color = Colors.blue;
+        icon = Icons.info;
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 18, color: color),
+            ),
+            if (showLine)
+              Container(
+                width: 2,
+                height: 40,
+                color: theme.colorScheme.outline.withOpacity(0.3),
+              ),
+          ],
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    gecmis.eskiDurum != null
+                        ? '${gecmis.eskiDurum} → ${gecmis.yeniDurum}'
+                        : gecmis.yeniDurum,
+                    style: TextStyle(fontWeight: FontWeight.bold, color: color),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                DateUtil.displayDateTime(gecmis.degisiklikTarihi),
+                style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
+              ),
+              if (gecmis.aciklama != null && gecmis.aciklama!.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  gecmis.aciklama!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

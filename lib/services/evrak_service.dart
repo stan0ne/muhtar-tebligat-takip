@@ -2,6 +2,7 @@ import '../core/constants.dart';
 import '../core/date_util.dart';
 import '../data/models/evrak.dart';
 import '../data/models/teslim_kaydi.dart';
+import '../data/models/durum_gecmisi.dart';
 import '../data/repositories/evrak_repository.dart';
 import '../data/repositories/teslim_repository.dart';
 import 'log_service.dart';
@@ -179,4 +180,7 @@ class EvrakService {
 
   Future<List<Evrak>> listInRange(String bas, String son) =>
       _repo.listInRange(bas, son);
+
+  Future<List<DurumGecmisi>> durumGecmisi(int evrakId) =>
+      _repo.durumGecmisi(evrakId);
 }

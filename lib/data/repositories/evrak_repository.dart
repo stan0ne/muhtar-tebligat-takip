@@ -1,6 +1,8 @@
 import '../models/evrak.dart';
 import '../models/teslim_kaydi.dart';
+import '../models/durum_gecmisi.dart';
 import 'base_repository.dart';
+import 'durum_gecmisi_repository.dart';
 import '../../core/constants.dart';
 
 /// Arama filtresi.
@@ -241,9 +243,22 @@ class EvrakRepository extends BaseRepository {
   }
 
   /// Durum günceller (arsivleme, geri alma, teslim).
-  Future<int> setDurum(int id, String durum, {String? teslimTarihi}) async {
+  Future<int> setDurum(int id, String durum, {String? teslimTarihi, String? aciklama}) async {
     final existing = await getById(id, includeDeleted: true);
     if (existing == null) return 0;
+
+    // Durum değişikliğini kaydet
+    if (existing.durum != durum) {
+      final gecmisRepo = DurumGecmisiRepository();
+      await gecmisRepo.insert(DurumGecmisi(
+        evrakId: id,
+        eskiDurum: existing.durum,
+        yeniDurum: durum,
+        degisiklikTarihi: DateTime.now().toIso8601String(),
+        aciklama: aciklama,
+      ));
+    }
+
     final updated = existing.copyWith(
       durum: durum,
       teslimTarihi: teslimTarihi ?? existing.teslimTarihi,
@@ -266,14 +281,27 @@ class EvrakRepository extends BaseRepository {
   }
 
   /// Toplu durum güncelleme (transaction içinde).
-  Future<void> setDurumToplu(List<int> ids, String durum, {String? teslimTarihi}) async {
+  Future<void> setDurumToplu(List<int> ids, String durum, {String? teslimTarihi, String? aciklama}) async {
     if (ids.isEmpty) return;
     final database = await db;
     final now = DateTime.now().toIso8601String();
+    final gecmisRepo = DurumGecmisiRepository();
     await database.transaction((txn) async {
       for (final id in ids) {
         final existing = await getById(id, includeDeleted: true);
         if (existing == null) continue;
+
+        // Durum değişikliğini kaydet
+        if (existing.durum != durum) {
+          await gecmisRepo.insert(DurumGecmisi(
+            evrakId: id,
+            eskiDurum: existing.durum,
+            yeniDurum: durum,
+            degisiklikTarihi: now,
+            aciklama: aciklama,
+          ));
+        }
+
         final updated = existing.copyWith(
           durum: durum,
           teslimTarihi: teslimTarihi ?? existing.teslimTarihi,
@@ -282,6 +310,12 @@ class EvrakRepository extends BaseRepository {
         await txn.update(_table, updated.toMap(), where: 'id = ?', whereArgs: [id]);
       }
     });
+  }
+
+  /// Bir evrakın durum geçmişini getir.
+  Future<List<DurumGecmisi>> durumGecmisi(int evrakId) async {
+    final gecmisRepo = DurumGecmisiRepository();
+    return gecmisRepo.listForEvrak(evrakId);
   }
 
   /// Yumuşak silme (silindi_mi = 1).
