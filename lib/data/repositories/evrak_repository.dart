@@ -14,6 +14,7 @@ class EvrakFilter {
   final String? hizliArama; // çoklu alan araması (evrak + teslim alan)
   final String? teslimAlan; // teslim alan kişi adı
   final String? telefon; // teslim alan telefon
+  final String? tcKimlikNo; // teslim alan TC kimlik no
   final bool includeDeleted;
 
   const EvrakFilter({
@@ -26,6 +27,7 @@ class EvrakFilter {
     this.hizliArama,
     this.teslimAlan,
     this.telefon,
+    this.tcKimlikNo,
     this.includeDeleted = false,
   });
 
@@ -38,7 +40,8 @@ class EvrakFilter {
       (tarihBitis == null || tarihBitis!.isEmpty) &&
       (hizliArama == null || hizliArama!.isEmpty) &&
       (teslimAlan == null || teslimAlan!.isEmpty) &&
-      (telefon == null || telefon!.isEmpty);
+      (telefon == null || telefon!.isEmpty) &&
+      (tcKimlikNo == null || tcKimlikNo!.isEmpty);
 
   EvrakFilter copyWith({
     String? adSoyad,
@@ -168,8 +171,17 @@ class EvrakRepository extends BaseRepository {
       );
       args.add('%${toLowerTurkce(filter.telefon!)}%');
     }
+    if (hasVal(filter.tcKimlikNo)) {
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write(
+        "EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id"
+        " AND t.tc_kimlik_no LIKE ?)",
+      );
+      args.add('%${filter.tcKimlikNo!}%');
+    }
     if (hasVal(filter.hizliArama)) {
       final q = '%${toLowerTurkce(filter.hizliArama!)}%';
+      final qRaw = '%${filter.hizliArama!}%';
       if (where.isNotEmpty) where.write(' AND ');
       where.write('('
           '${tl("ad_soyad")} LIKE ?'
@@ -177,9 +189,10 @@ class EvrakRepository extends BaseRepository {
           ' OR ${tl("geldigi_kurum")} LIKE ?'
           ' OR EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
           '   AND (${tl("t.teslim_alan_ad_soyad")} LIKE ?'
-          '        OR ${tl("t.telefon")} LIKE ?))'
+          '        OR ${tl("t.telefon")} LIKE ?'
+          '        OR t.tc_kimlik_no LIKE ?))'
           ')');
-      args.addAll([q, q, q, q, q]);
+      args.addAll([q, q, q, q, q, qRaw]);
     }
     if (hasVal(filter.durum)) {
       if (where.isNotEmpty) where.write(' AND ');

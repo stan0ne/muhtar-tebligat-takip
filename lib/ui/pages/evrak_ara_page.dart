@@ -22,6 +22,7 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
   final _sayiCtrl = TextEditingController();
   final _kurumCtrl = TextEditingController();
   final _teslimAlanCtrl = TextEditingController();
+  final _tcCtrl = TextEditingController();
   final _telefonCtrl = TextEditingController();
   final _basCtrl = TextEditingController();
   final _sonCtrl = TextEditingController();
@@ -40,7 +41,7 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
   void initState() {
     super.initState();
     _hizliArama = widget.hizliArama;
-    for (final c in [_adCtrl, _sayiCtrl, _kurumCtrl, _teslimAlanCtrl, _telefonCtrl]) {
+    for (final c in [_adCtrl, _sayiCtrl, _kurumCtrl, _teslimAlanCtrl, _tcCtrl, _telefonCtrl]) {
       c.addListener(_onChanged);
     }
     _search();
@@ -53,6 +54,7 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
     _sayiCtrl.dispose();
     _kurumCtrl.dispose();
     _teslimAlanCtrl.dispose();
+    _tcCtrl.dispose();
     _telefonCtrl.dispose();
     _basCtrl.dispose();
     _sonCtrl.dispose();
@@ -76,6 +78,7 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
         evrakSayisi: _sayiCtrl.text.trim().isEmpty ? null : _sayiCtrl.text.trim(),
         geldigiKurum: _kurumCtrl.text.trim().isEmpty ? null : _kurumCtrl.text.trim(),
         teslimAlan: _teslimAlanCtrl.text.trim().isEmpty ? null : _teslimAlanCtrl.text.trim(),
+        tcKimlikNo: _tcCtrl.text.trim().isEmpty ? null : _tcCtrl.text.trim(),
         telefon: _telefonCtrl.text.trim().isEmpty ? null : _telefonCtrl.text.trim(),
         durum: _durum,
         tarihBaslangic: _basCtrl.text.isEmpty ? null : _basCtrl.text,
@@ -126,6 +129,7 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
     _sayiCtrl.clear();
     _kurumCtrl.clear();
     _teslimAlanCtrl.clear();
+    _tcCtrl.clear();
     _telefonCtrl.clear();
     _basCtrl.clear();
     _sonCtrl.clear();
@@ -191,6 +195,18 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
                   decoration: const InputDecoration(
                     labelText: 'Teslim Alan',
                     prefixIcon: Icon(Icons.how_to_reg),
+                    isDense: true,
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 180,
+                child: TextField(
+                  controller: _tcCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'TC Kimlik No',
+                    prefixIcon: Icon(Icons.badge),
                     isDense: true,
                     border: OutlineInputBorder(),
                   ),
