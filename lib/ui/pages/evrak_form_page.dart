@@ -25,8 +25,9 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
   void initState() {
     super.initState();
     final e = widget.evrak;
-    _gelisCtrl = TextEditingController(
-        text: e?.gelisTarihi ?? DateUtil.todayIso());
+    // ISO formatını display formatına çevir (DD-MM-YYYY)
+    final gelisTarihi = e?.gelisTarihi ?? DateUtil.todayIso();
+    _gelisCtrl = TextEditingController(text: DateUtil.displayDate(gelisTarihi));
     _adCtrl.text = e?.adSoyad ?? '';
     _kurumCtrl.text = e?.geldigiKurum ?? '';
     _sayiCtrl.text = e?.evrakSayisi ?? '';
@@ -44,7 +45,7 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
   Future<void> _pickDate() async {
     DateTime initial;
     try {
-      initial = DateFormat('yyyy-MM-dd').parse(_gelisCtrl.text);
+      initial = DateFormat('dd-MM-yyyy').parse(_gelisCtrl.text);
     } catch (_) {
       initial = DateTime.now();
     }
@@ -55,7 +56,16 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
-      _gelisCtrl.text = DateFormat('yyyy-MM-dd').format(picked);
+      _gelisCtrl.text = DateFormat('dd-MM-yyyy').format(picked);
+    }
+  }
+
+  /// Display formatındaki tarihi ISO formatına çevir.
+  String _toIsoDate(String displayDate) {
+    try {
+      return DateFormat('yyyy-MM-dd').format(DateFormat('dd-MM-yyyy').parse(displayDate));
+    } catch (_) {
+      return displayDate;
     }
   }
 
@@ -63,9 +73,10 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     try {
+      final gelisTarihiIso = _toIsoDate(_gelisCtrl.text.trim());
       if (widget.evrak == null) {
         await Services.evrak.ekle(
-          gelisTarihi: _gelisCtrl.text.trim(),
+          gelisTarihi: gelisTarihiIso,
           adSoyad: _adCtrl.text,
           geldigiKurum: _kurumCtrl.text,
           evrakSayisi: _sayiCtrl.text,
@@ -77,11 +88,11 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
           _adCtrl.clear();
           _kurumCtrl.clear();
           _sayiCtrl.clear();
-          _gelisCtrl.text = DateUtil.todayIso();
+          _gelisCtrl.text = DateUtil.displayDate(DateUtil.todayIso());
         }
       } else {
         final updated = widget.evrak!.copyWith(
-          gelisTarihi: _gelisCtrl.text.trim(),
+          gelisTarihi: gelisTarihiIso,
           adSoyad: _adCtrl.text,
           geldigiKurum: _kurumCtrl.text,
           evrakSayisi: _sayiCtrl.text,

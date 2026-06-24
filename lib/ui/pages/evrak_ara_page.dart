@@ -73,6 +73,16 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
   Future<void> _search() async {
     setState(() => _loading = true);
     try {
+      // Display formatındaki tarihleri ISO formatına çevir
+      String? toIso(String? display) {
+        if (display == null || display.isEmpty) return null;
+        try {
+          return DateFormat('yyyy-MM-dd').format(DateFormat('dd-MM-yyyy').parse(display));
+        } catch (_) {
+          return display;
+        }
+      }
+
       final filter = EvrakFilter(
         adSoyad: _adCtrl.text.trim().isEmpty ? null : _adCtrl.text.trim(),
         evrakSayisi: _sayiCtrl.text.trim().isEmpty ? null : _sayiCtrl.text.trim(),
@@ -81,8 +91,8 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
         tcKimlikNo: _tcCtrl.text.trim().isEmpty ? null : _tcCtrl.text.trim(),
         telefon: _telefonCtrl.text.trim().isEmpty ? null : _telefonCtrl.text.trim(),
         durum: _durum,
-        tarihBaslangic: _basCtrl.text.isEmpty ? null : _basCtrl.text,
-        tarihBitis: _sonCtrl.text.isEmpty ? null : _sonCtrl.text,
+        tarihBaslangic: toIso(_basCtrl.text),
+        tarihBitis: toIso(_sonCtrl.text),
         hizliArama: _hizliArama.isNotEmpty ? _hizliArama : null,
       );
       final res = await Services.evrak.search(
@@ -107,7 +117,7 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
   Future<void> _pickDate(TextEditingController ctrl) async {
     DateTime initial;
     try {
-      initial = DateFormat('yyyy-MM-dd').parse(ctrl.text);
+      initial = DateFormat('dd-MM-yyyy').parse(ctrl.text);
     } catch (_) {
       initial = DateTime.now();
     }
@@ -118,7 +128,7 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
       lastDate: DateTime(2100),
     );
     if (picked != null) {
-      ctrl.text = DateFormat('yyyy-MM-dd').format(picked);
+      ctrl.text = DateFormat('dd-MM-yyyy').format(picked);
       _page = 1;
       _search();
     }

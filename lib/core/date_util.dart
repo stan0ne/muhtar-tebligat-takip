@@ -6,8 +6,8 @@ class DateUtil {
 
   static final DateFormat _isoDate = DateFormat('yyyy-MM-dd');
   static final DateFormat _isoDateTime = DateFormat('yyyy-MM-dd HH:mm:ss');
-  static final DateFormat _displayDate = DateFormat('dd.MM.yyyy');
-  static final DateFormat _displayDateTime = DateFormat('dd.MM.yyyy HH:mm');
+  static final DateFormat _displayDate = DateFormat('dd-MM-yyyy');
+  static final DateFormat _displayDateTime = DateFormat('dd-MM-yyyy HH:mm');
 
   /// Bugünün tarihini ISO (yyyy-MM-dd) olarak döndürür.
   static String todayIso() => _isoDate.format(DateTime.now());
