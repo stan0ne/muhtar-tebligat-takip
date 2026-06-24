@@ -22,8 +22,9 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - **EvrakDetay sayfası geri dönüş**: AppBar geri butonu eklendi.
 - **Teslim Et sonrası dönüş**: Teslim işleminden sonra otomatik olarak ana sayfaya (liste) dönülüyor.
 - **Sil butonu aktif**: Tüm kullanıcılar için aktif, onay dialogu ile çalışıyor.
-- **Hızlı arama çoklu alan**: Ad Soyad, Evrak No, Geldiği Kurum, Teslim Alan Kişi ve Telefon alanlarında OR araması yapıyor.
-- **Evrak Ara filtreleri**: Teslim Alan ve Telefon filtreleri eklendi, filtre değişikliğinde canlı arama tetikleniyor, filtre temizlenince sonuçlar da temizleniyor.
+- **Hızlı arama çoklu alan**: Ad Soyad, Evrak No, Geldiği Kurum, Teslim Alan Kişi, Telefon ve TC Kimlik No alanlarında OR araması yapıyor.
+- **Evrak Ara filtreleri**: Teslim Alan, Telefon ve TC Kimlik No filtreleri eklendi, filtre değişikliğinde canlı arama tetikleniyor, filtre temizlenince sonuçlar da temizleniyor.
+- **Türkçe karakter arama**: `COLLATE NOCASE` ve `LOWER()` yerine SQL `REPLACE` zincirleri + Dart `toLowerTurkce()` ile İ→i, Ü→ü, Ş→ş, Ö→ö, Ç→ç, Ğ→ğ dönüşümleri yapılıyor.
 
 ### Eklendi
 - **Muhtarlık bilgileri**: Ayarlar sayfasına Muhtarlık Adı, Muhtar Adı Soyadı, İl ve İlçe alanları eklendi (SharedPreferences ile kayıtlı).
