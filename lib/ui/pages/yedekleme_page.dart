@@ -17,7 +17,10 @@ class YedeklemePage extends StatefulWidget {
 
 class _YedeklemePageState extends State<YedeklemePage> {
   List<File> _backups = [];
+  List<File> _externalBackups = [];
   bool _loading = false;
+  String? _externalPath;
+  bool _savingExternal = false;
 
   @override
   void initState() {
@@ -29,7 +32,15 @@ class _YedeklemePageState extends State<YedeklemePage> {
     setState(() => _loading = true);
     try {
       final files = await Services.backup.listBackups();
-      if (mounted) setState(() => _backups = files);
+      final extPath = await Services.backup.getExternalPath();
+      final extFiles = await Services.backup.listExternalBackups();
+      if (mounted) {
+        setState(() {
+          _backups = files;
+          _externalPath = extPath;
+          _externalBackups = extFiles;
+        });
+      }
     } catch (_) {}
     if (mounted) setState(() => _loading = false);
   }
@@ -46,6 +57,41 @@ class _YedeklemePageState extends State<YedeklemePage> {
       _load();
     } catch (e) {
       _showError(e);
+    }
+  }
+
+  Future<void> _backupToExternal() async {
+    if (_externalPath == null || _externalPath!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Önce harici yedekleme konumunu seçin.')),
+      );
+      return;
+    }
+    try {
+      final file = await Services.backup.backupToExternal();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Harici yedek alındı: ${p.basename(file.path)}')),
+        );
+      }
+      _load();
+    } catch (e) {
+      _showError(e);
+    }
+  }
+
+  Future<void> _selectExternalDir() async {
+    final result = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: 'Harici Yedekleme Konumu Seçin',
+    );
+    if (result != null && result.isNotEmpty) {
+      setState(() => _savingExternal = true);
+      await Services.backup.setExternalPath(result);
+      setState(() {
+        _externalPath = result;
+        _savingExternal = false;
+      });
+      _load();
     }
   }
 
@@ -109,19 +155,23 @@ class _YedeklemePageState extends State<YedeklemePage> {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
+    final theme = Theme.of(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Yedekleme', style: Theme.of(context).textTheme.titleLarge),
+          Text('Yedekleme', style: theme.textTheme.titleLarge),
           const SizedBox(height: 12),
+          // --- Dahili Yedekleme ---
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text('Dahili Yedekleme', style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       FilledButton.icon(
@@ -159,10 +209,99 @@ class _YedeklemePageState extends State<YedeklemePage> {
             ),
           ),
           const SizedBox(height: 16),
+          // --- Harici Yedekleme ---
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.folder, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Harici Yedekleme', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          readOnly: true,
+                          controller: TextEditingController(text: _externalPath ?? ''),
+                          decoration: InputDecoration(
+                            labelText: 'Yedekleme Konumu',
+                            hintText: 'Dizin seçilmedi',
+                            border: const OutlineInputBorder(),
+                            isDense: true,
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.folder_open),
+                              onPressed: _selectExternalDir,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.tonalIcon(
+                        onPressed: _savingExternal ? null : _backupToExternal,
+                        icon: _savingExternal
+                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Icon(Icons.backup),
+                        label: const Text('Yedekle'),
+                      ),
+                    ],
+                  ),
+                  if (_externalBackups.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Text('Harici Yedekler (${_externalBackups.length})',
+                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _externalBackups.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (_, i) {
+                        final f = _externalBackups[i];
+                        final stat = f.statSync();
+                        return ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.storage, color: Colors.green),
+                          title: Text(p.basename(f.path), style: const TextStyle(fontSize: 13)),
+                          subtitle: Text(
+                            '${stat.size ~/ 1024} KB • ${stat.modified.toLocal()}',
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                tooltip: 'Geri Yükle',
+                                icon: const Icon(Icons.restore, size: 18),
+                                onPressed: () => _restore(f),
+                              ),
+                              IconButton(
+                                tooltip: 'Sil',
+                                icon: const Icon(Icons.delete, color: Colors.red, size: 18),
+                                onPressed: () => _delete(f),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // --- Mevcut Yedekler ---
           Row(
             children: [
               Text('Mevcut Yedekler (${_backups.length})',
-                  style: Theme.of(context).textTheme.titleMedium),
+                  style: theme.textTheme.titleMedium),
               const Spacer(),
               IconButton(onPressed: _load, icon: const Icon(Icons.refresh)),
             ],

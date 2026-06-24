@@ -10,12 +10,60 @@ import 'log_service.dart';
 class BackupService {
   final DatabaseHelper _helper = DatabaseHelper.instance;
 
-  /// Veritabanı dosyasının bulunduğu dizin.
+  /// Mevcut db dosyasının bulunduğu dizin (dahili yedekleme).
   Future<Directory> get backupDir async {
     final support = await getApplicationSupportDirectory();
     final dir = Directory(p.join(support.path, 'backups'));
     if (!dir.existsSync()) dir.createSync(recursive: true);
     return dir;
+  }
+
+  /// Harici yedekleme konumunu getir (SharedPreferences'dan).
+  Future<String?> getExternalPath() async {
+    return Services.settings.get('external_backup_path');
+  }
+
+  /// Harici yedekleme konumunu kaydet.
+  Future<void> setExternalPath(String path) async {
+    await Services.settings.set('external_backup_path', path);
+  }
+
+  /// Harici konuma yedek al.
+  Future<File> backupToExternal() async {
+    final externalPath = await getExternalPath();
+    if (externalPath == null || externalPath.isEmpty) {
+      throw StateError('Harici yedekleme konumu ayarlanmamış');
+    }
+    final dir = Directory(externalPath);
+    if (!dir.existsSync()) dir.createSync(recursive: true);
+
+    await _helper.database;
+    final srcPath = await _helper.dbPath;
+    final src = File(srcPath);
+    if (!src.existsSync()) {
+      throw FileSystemException('Veritabanı dosyası bulunamadı', srcPath);
+    }
+    final stamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+    final dest = File(p.join(dir.path, 'tebligat_yedek_$stamp.db'));
+    await src.copy(dest.path);
+    await Services.log.log(LogIslem.yedekleme,
+        aciklama: 'Harici konum: ${dest.path}');
+    return dest;
+  }
+
+  /// Harici konumdaki yedekleri listele.
+  Future<List<File>> listExternalBackups() async {
+    final externalPath = await getExternalPath();
+    if (externalPath == null || externalPath.isEmpty) return [];
+    final dir = Directory(externalPath);
+    if (!dir.existsSync()) return [];
+    final files = dir
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.toLowerCase().endsWith('.db'))
+        .toList()
+      ..sort((a, b) => b.path.compareTo(a.path));
+    return files;
   }
 
   /// Mevcut db dosyasını zaman damgalı kopya olarak yedekler.
