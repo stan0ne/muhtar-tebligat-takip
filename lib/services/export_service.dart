@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -85,28 +86,33 @@ class ExportService {
   Future<String> exportPdf(RaporSonuc rapor) async {
     final doc = pw.Document();
 
+    // Türkçe karakter desteği için font yükle
+    final fontData = await rootBundle.load('assets/fonts/arial.ttf');
+    final font = pw.Font.ttf(fontData);
+
     doc.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.all(32),
         build: (ctx) => [
           pw.Text(rapor.baslik,
-              style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+              style: pw.TextStyle(font: font, fontSize: 18, fontWeight: pw.FontWeight.bold)),
           pw.SizedBox(height: 8),
           pw.Text(
             'Dönem: ${DateFormat('dd.MM.yyyy').format(rapor.baslangic)} - '
             '${DateFormat('dd.MM.yyyy').format(rapor.bitis)}',
+            style: pw.TextStyle(font: font),
           ),
           pw.SizedBox(height: 8),
           pw.Row(
             children: [
-              _pill('Toplam', rapor.toplam),
+              _pill('Toplam', rapor.toplam, font),
               pw.SizedBox(width: 12),
-              _pill('Bekleyen', rapor.bekleyen),
+              _pill('Bekleyen', rapor.bekleyen, font),
               pw.SizedBox(width: 12),
-              _pill('Teslim Edilen', rapor.teslimEdilen),
+              _pill('Teslim Edilen', rapor.teslimEdilen, font),
               pw.SizedBox(width: 12),
-              _pill('Arşivlenen', rapor.arsivlenen),
+              _pill('Arşivlenen', rapor.arsivlenen, font),
             ],
           ),
           pw.SizedBox(height: 16),
@@ -129,7 +135,8 @@ class ExportService {
                       DateUtil.displayDate(e.teslimTarihi),
                     ])
                 .toList(),
-            headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+            headerStyle: pw.TextStyle(font: font, fontWeight: pw.FontWeight.bold),
+            cellStyle: pw.TextStyle(font: font),
             cellAlignment: pw.Alignment.centerLeft,
             headerDecoration: const pw.BoxDecoration(
                 color: PdfColor(0.85, 0.85, 0.85)),
@@ -146,14 +153,14 @@ class ExportService {
     return file.path;
   }
 
-  pw.Widget _pill(String label, int value) {
+  pw.Widget _pill(String label, int value, pw.Font font) {
     return pw.Container(
       padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: pw.BoxDecoration(
         border: pw.Border.all(color: PdfColor(0.7, 0.7, 0.7)),
         borderRadius: pw.BorderRadius.circular(6),
       ),
-      child: pw.Text('$label: $value'),
+      child: pw.Text('$label: $value', style: pw.TextStyle(font: font)),
     );
   }
 }

@@ -12,6 +12,28 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
 ---
 
+## [1.1.0] — 2026-06-24
+
+### Düzeltildi
+- **"Kayıt bulunamadı" hatası**: `EvrakRepository` LIKE filtrelerinde `null` değerler `%null%` stringine dönüştüğü için hiçbir kayıt eşleşmiyordu. Artık `null`/boş filtreler atlanıyor.
+- **Evrak arama çalışmama**: `database.query()` → `database.rawQuery()` ile sqflite_common_ffi parametre sorunu giderildi.
+- **TAB sırası**: `HomeShell` ve `EvrakFormPage` `FocusTraversalGroup` ile sarılarak formda ve sayfalar arası geçiş düzeltildi.
+- **EvrakListePage durum değişkenliği**: `didUpdateWidget` + `ValueKey` ile sayfalar arası geçişlerde doğru veri yüklenmesi sağlandı.
+
+### Eklendi
+- **EvrakDetay sayfası geri dönüş**: AppBar geri butonu + ESC tuşu ile detay sayfasından çıkış desteği.
+- **Login ekranı kaldırıldı**: Uygulama doğrudan ana ekrana açılıyor, kimlik doğrulaması gerekmiyor.
+- **PDF Türkçe karakter desteği**: Arial fontu gömülü olarak eklendi, tüm PDF metinleri Arial ile oluşturuluyor.
+- **Uygulama adı**: "Muhtar Tebligat Takip" olarak değiştirildi (pencere başlığı, EXE bilgileri).
+- **Uygulama verisi yolu**: `%appdata%\MuhtarTebligat` konumuna taşındı, eski yoldan otomatik migrasyon.
+- **Uygulama ikonu**: Yeni turuncu temalı ikon eklendi (16x16 — 256x256 boyutları).
+- **Hata yakalama**: Arama ve liste sayfalarında `_load()` / `_search()` hataları SnackBar ile gösteriliyor.
+
+### Değişti
+- Form alanları sırası: Ad Soyad → Geldiği Kurum → Evrak Sayısı → Geliş Tarihi
+
+---
+
 ## [1.0.0] — 2026-06-23
 
 ### Eklendi

@@ -118,89 +118,94 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
               padding: const EdgeInsets.all(24),
               child: Form(
                 key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      isEdit ? 'Evrak Düzenle' : 'Yeni Evrak Kaydı',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _gelisCtrl,
-                            readOnly: true,
-                            decoration: InputDecoration(
-                              labelText: 'Geliş Tarihi',
-                              prefixIcon: const Icon(Icons.event),
-                              border: const OutlineInputBorder(),
+                child: FocusTraversalGroup(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        isEdit ? 'Evrak Düzenle' : 'Yeni Evrak Kaydı',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 20),
+                      TextFormField(
+                        controller: _adCtrl,
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          labelText: 'Ad Soyad *',
+                          prefixIcon: Icon(Icons.person),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? 'Ad Soyad zorunlu'
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _kurumCtrl,
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          labelText: 'Geldiği Kurum',
+                          prefixIcon: Icon(Icons.account_balance),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _sayiCtrl,
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          labelText: 'Evrak Sayısı',
+                          prefixIcon: Icon(Icons.numbers),
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _gelisCtrl,
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                labelText: 'Geliş Tarihi',
+                                prefixIcon: const Icon(Icons.event),
+                                border: const OutlineInputBorder(),
+                              ),
+                              validator: (v) => (v == null || v.isEmpty)
+                                  ? 'Tarih zorunlu'
+                                  : null,
                             ),
-                            validator: (v) => (v == null || v.isEmpty)
-                                ? 'Tarih zorunlu'
-                                : null,
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        IconButton.outlined(
-                          onPressed: _pickDate,
-                          icon: const Icon(Icons.calendar_today),
-                          tooltip: 'Tarih Seç',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _adCtrl,
-                      textCapitalization: TextCapitalization.words,
-                      decoration: const InputDecoration(
-                        labelText: 'Ad Soyad *',
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Ad Soyad zorunlu'
-                          : null,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _kurumCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Geldiği Kurum',
-                        prefixIcon: Icon(Icons.account_balance),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _sayiCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Evrak Sayısı',
-                        prefixIcon: Icon(Icons.numbers),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FilledButton.icon(
-                            onPressed: _saving ? null : _save,
-                            icon: const Icon(Icons.save),
-                            label: Text(isEdit ? 'Güncelle' : 'Kaydet'),
-                          ),
-                        ),
-                        if (isEdit) ...[
                           const SizedBox(width: 12),
-                          OutlinedButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            child: const Text('İptal'),
+                          IconButton.outlined(
+                            onPressed: _pickDate,
+                            icon: const Icon(Icons.calendar_today),
+                            tooltip: 'Tarih Seç',
                           ),
                         ],
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FilledButton.icon(
+                              onPressed: _saving ? null : _save,
+                              icon: const Icon(Icons.save),
+                              label: Text(isEdit ? 'Güncelle' : 'Kaydet'),
+                            ),
+                          ),
+                          if (isEdit) ...[
+                            const SizedBox(width: 12),
+                            OutlinedButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text('İptal'),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

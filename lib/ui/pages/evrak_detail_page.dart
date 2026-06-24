@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/constants.dart';
 import '../../core/date_util.dart';
 import '../../data/models/evrak.dart';
@@ -103,128 +104,171 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
     if (updated == true && mounted) _load();
   }
 
+  void _goBack() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_loading) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Geri',
+            onPressed: _goBack,
+          ),
+          title: const Text('Yükleniyor...'),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
     if (_evrak == null) {
-      return const Center(child: Text('Evrak bulunamadı.'));
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Geri',
+            onPressed: _goBack,
+          ),
+          title: const Text('Hata'),
+        ),
+        body: const Center(child: Text('Evrak bulunamadı.')),
+      );
     }
     final e = _evrak!;
     final theme = Theme.of(context);
     final isBekleyen = e.durum == EvrakDurum.bekliyor;
     final isArsiv = e.durum == EvrakDurum.arsivlendi;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.escape): _goBack,
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Geri',
+            onPressed: _goBack,
+          ),
+          title: Text(e.adSoyad),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: Text(e.adSoyad,
-                        style: theme.textTheme.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.bold)),
-                  ),
-                  UiUtil.durumChip(context, e.durum),
-                ],
-              ),
-              const Divider(height: 32),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
+                  Row(
                     children: [
-                      _row('Geliş Tarihi', DateUtil.displayDate(e.gelisTarihi)),
-                      _row('Ad Soyad', e.adSoyad),
-                      _row('Geldiği Kurum', e.geldigiKurum ?? '-'),
-                      _row('Evrak Sayısı', e.evrakSayisi ?? '-'),
-                      _row('Teslim Tarihi', DateUtil.displayDateTime(e.teslimTarihi)),
-                      _row('Oluşturma', DateUtil.displayDateTime(e.olusturmaTarihi)),
-                      _row('Güncelleme', DateUtil.displayDateTime(e.guncellemeTarihi)),
-                      if (e.silindiMi == 1)
-                        _row('Silinme', DateUtil.displayDateTime(e.silinmeTarihi),
-                            color: Colors.red),
+                      Expanded(
+                        child: Text(e.adSoyad,
+                            style: theme.textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold)),
+                      ),
+                      UiUtil.durumChip(context, e.durum),
                     ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Teslim Geçmişi (${_teslim.length})',
-                    style: theme.textTheme.titleMedium),
-              ),
-              const SizedBox(height: 8),
-              if (_teslim.isEmpty)
-                const Text('Henüz teslim kaydı yok.')
-              else
-                Card(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _teslim.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (_, i) {
-                      final t = _teslim[i];
-                      return ListTile(
-                        dense: true,
-                        leading: const Icon(Icons.check_circle, color: Colors.green),
-                        title: Text(t.teslimAlanAdSoyad),
-                        subtitle: Text(DateUtil.displayDateTime(t.teslimTarihi)),
-                        trailing: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (t.tcKimlikNo != null) Text('TC: ${t.tcKimlikNo}'),
-                            if (t.telefon != null) Text('Tel: ${t.telefon}'),
-                          ],
+                  const Divider(height: 32),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          _row('Geliş Tarihi', DateUtil.displayDate(e.gelisTarihi)),
+                          _row('Ad Soyad', e.adSoyad),
+                          _row('Geldiği Kurum', e.geldigiKurum ?? '-'),
+                          _row('Evrak Sayısı', e.evrakSayisi ?? '-'),
+                          _row('Teslim Tarihi', DateUtil.displayDateTime(e.teslimTarihi)),
+                          _row('Oluşturma', DateUtil.displayDateTime(e.olusturmaTarihi)),
+                          _row('Güncelleme', DateUtil.displayDateTime(e.guncellemeTarihi)),
+                          if (e.silindiMi == 1)
+                            _row('Silinme', DateUtil.displayDateTime(e.silinmeTarihi),
+                                color: Colors.red),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Teslim Geçmişi (${_teslim.length})',
+                        style: theme.textTheme.titleMedium),
+                  ),
+                  const SizedBox(height: 8),
+                  if (_teslim.isEmpty)
+                    const Text('Henüz teslim kaydı yok.')
+                  else
+                    Card(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _teslim.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (_, i) {
+                          final t = _teslim[i];
+                          return ListTile(
+                            dense: true,
+                            leading: const Icon(Icons.check_circle, color: Colors.green),
+                            title: Text(t.teslimAlanAdSoyad),
+                            subtitle: Text(DateUtil.displayDateTime(t.teslimTarihi)),
+                            trailing: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (t.tcKimlikNo != null) Text('TC: ${t.tcKimlikNo}'),
+                                if (t.telefon != null) Text('Tel: ${t.telefon}'),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  const SizedBox(height: 20),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 8,
+                    children: [
+                      if (isBekleyen)
+                        FilledButton.icon(
+                          onPressed: _teslimEt,
+                          icon: const Icon(Icons.local_shipping),
+                          label: const Text('Teslim Et'),
                         ),
-                      );
-                    },
+                      OutlinedButton.icon(
+                        onPressed: _duzenle,
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Düzenle'),
+                      ),
+                      if (isBekleyen)
+                        OutlinedButton.icon(
+                          onPressed: _arsivle,
+                          icon: const Icon(Icons.archive),
+                          label: const Text('Arşivle'),
+                        ),
+                      if (isArsiv)
+                        OutlinedButton.icon(
+                          onPressed: _geriAl,
+                          icon: const Icon(Icons.restore),
+                          label: const Text('Bekleyene Geri Al'),
+                        ),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                        onPressed: Services.auth.currentUser?.isYonetici == true ? _sil : null,
+                        icon: const Icon(Icons.delete),
+                        label: const Text('Sil (Yönetici)'),
+                      ),
+                    ],
                   ),
-                ),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 12,
-                runSpacing: 8,
-                children: [
-                  if (isBekleyen)
-                    FilledButton.icon(
-                      onPressed: _teslimEt,
-                      icon: const Icon(Icons.local_shipping),
-                      label: const Text('Teslim Et'),
-                    ),
-                  OutlinedButton.icon(
-                    onPressed: _duzenle,
-                    icon: const Icon(Icons.edit),
-                    label: const Text('Düzenle'),
-                  ),
-                  if (isBekleyen)
-                    OutlinedButton.icon(
-                      onPressed: _arsivle,
-                      icon: const Icon(Icons.archive),
-                      label: const Text('Arşivle'),
-                    ),
-                  if (isArsiv)
-                    OutlinedButton.icon(
-                      onPressed: _geriAl,
-                      icon: const Icon(Icons.restore),
-                      label: const Text('Bekleyene Geri Al'),
-                    ),
-                  OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
-                    onPressed: Services.auth.currentUser?.isYonetici == true ? _sil : null,
-                    icon: const Icon(Icons.delete),
-                    label: const Text('Sil (Yönetici)'),
-                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
         ),
       ),

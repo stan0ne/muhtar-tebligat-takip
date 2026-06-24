@@ -118,36 +118,39 @@ class EvrakRepository extends BaseRepository {
       args.add(value);
     }
 
-    addClause("ad_soyad LIKE ? COLLATE NOCASE", '%${filter.adSoyad}%');
-    addClause(
-        "evrak_sayisi LIKE ? COLLATE NOCASE", '%${filter.evrakSayisi}%');
-    addClause(
-        "geldigi_kurum LIKE ? COLLATE NOCASE", '%${filter.geldigiKurum}%');
+    if (filter.adSoyad != null && filter.adSoyad!.isNotEmpty) {
+      addClause("ad_soyad LIKE ? COLLATE NOCASE", '%${filter.adSoyad}%');
+    }
+    if (filter.evrakSayisi != null && filter.evrakSayisi!.isNotEmpty) {
+      addClause("evrak_sayisi LIKE ? COLLATE NOCASE", '%${filter.evrakSayisi}%');
+    }
+    if (filter.geldigiKurum != null && filter.geldigiKurum!.isNotEmpty) {
+      addClause("geldigi_kurum LIKE ? COLLATE NOCASE", '%${filter.geldigiKurum}%');
+    }
     addClause("durum = ?", filter.durum);
     if (filter.tarihBaslangic != null && filter.tarihBaslangic!.isNotEmpty) {
       addClause("gelis_tarihi >= ?", filter.tarihBaslangic);
     }
     if (filter.tarihBitis != null && filter.tarihBitis!.isNotEmpty) {
-      // Bitiş tarihini dahil etmek için +1 gün sınırı kullan.
       addClause("gelis_tarihi < ?", '${filter.tarihBitis} 23:59:59');
     }
 
     final whereStr = where.toString();
-    final countRows = await database.rawQuery(
-      'SELECT COUNT(*) AS c FROM $_table${whereStr.isEmpty ? '' : ' WHERE $whereStr'}',
-      args,
-    );
+    final offset = (page - 1) * pageSize;
+    final effectiveOffset = offset < 0 ? 0 : offset;
+
+    // rawQuery kullanarak database.query() olası sorunlarını eleyelim.
+    final countSql =
+        'SELECT COUNT(*) AS c FROM $_table${whereStr.isEmpty ? '' : ' WHERE $whereStr'}';
+    final dataSql =
+        'SELECT * FROM $_table${whereStr.isEmpty ? '' : ' WHERE $whereStr'}'
+        ' ORDER BY olusturma_tarihi DESC, id DESC'
+        ' LIMIT $pageSize OFFSET $effectiveOffset';
+
+    final countRows = await database.rawQuery(countSql, args.isEmpty ? null : args);
     final total = (countRows.first['c'] as int?) ?? 0;
 
-    final offset = (page - 1) * pageSize;
-    final rows = await database.query(
-      _table,
-      where: whereStr.isEmpty ? null : whereStr,
-      whereArgs: whereStr.isEmpty ? null : args,
-      orderBy: 'olusturma_tarihi DESC, id DESC',
-      limit: pageSize,
-      offset: offset < 0 ? 0 : offset,
-    );
+    final rows = await database.rawQuery(dataSql, args.isEmpty ? null : args);
 
     final items = rows.map(Evrak.fromMap).toList();
     return PagedResult(items: items, total: total, page: page, pageSize: pageSize);

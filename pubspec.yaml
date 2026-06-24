@@ -2,7 +2,7 @@ name: muhtar_tebligat_takip
 description: "Muhtarlık Tebligat Takip Sistemi"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: ^3.11.3
@@ -47,3 +47,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    - family: Arial
+      fonts:
+        - asset: assets/fonts/arial.ttf

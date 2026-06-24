@@ -64,22 +64,32 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
 
   Future<void> _search() async {
     setState(() => _loading = true);
-    final filter = EvrakFilter(
-      adSoyad: _adCtrl.text.trim().isEmpty ? null : _adCtrl.text.trim(),
-      evrakSayisi: _sayiCtrl.text.trim().isEmpty ? null : _sayiCtrl.text.trim(),
-      geldigiKurum: _kurumCtrl.text.trim().isEmpty ? null : _kurumCtrl.text.trim(),
-      durum: _durum,
-      tarihBaslangic: _basCtrl.text.isEmpty ? null : _basCtrl.text,
-      tarihBitis: _sonCtrl.text.isEmpty ? null : _sonCtrl.text,
-    );
-    final res = await Services.evrak.search(
-        filter: filter, page: _page, pageSize: _pageSize);
-    if (!mounted) return;
-    setState(() {
-      _items = res.items;
-      _total = res.total;
-      _loading = false;
-    });
+    try {
+      final filter = EvrakFilter(
+        adSoyad: _adCtrl.text.trim().isEmpty ? null : _adCtrl.text.trim(),
+        evrakSayisi: _sayiCtrl.text.trim().isEmpty ? null : _sayiCtrl.text.trim(),
+        geldigiKurum: _kurumCtrl.text.trim().isEmpty ? null : _kurumCtrl.text.trim(),
+        durum: _durum,
+        tarihBaslangic: _basCtrl.text.isEmpty ? null : _basCtrl.text,
+        tarihBitis: _sonCtrl.text.isEmpty ? null : _sonCtrl.text,
+      );
+      final res = await Services.evrak.search(
+          filter: filter, page: _page, pageSize: _pageSize);
+      if (!mounted) return;
+      setState(() {
+        _items = res.items;
+        _total = res.total;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Arama hatası: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   Future<void> _pickDate(TextEditingController ctrl) async {
@@ -188,7 +198,7 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
               ),
               SizedBox(
                 width: 170,
-                child: DropdownButtonFormField<String>(
+                child:               DropdownButtonFormField<String>(
                   initialValue: _durum,
                   decoration: const InputDecoration(
                     labelText: 'Durum',

@@ -10,14 +10,14 @@ class EvrakListePage extends StatefulWidget {
   final String durum;
   final String title;
 
-  const EvrakListePage._({required this.durum, required this.title});
+  const EvrakListePage._({super.key, required this.durum, required this.title});
 
-  const EvrakListePage.durumBekleyen()
-      : this._(durum: EvrakDurum.bekliyor, title: 'Bekleyen Evraklar');
-  const EvrakListePage.durumTeslimEdilen()
-      : this._(durum: EvrakDurum.teslimEdildi, title: 'Teslim Edilen Evraklar');
-  const EvrakListePage.durumArsivlendi()
-      : this._(durum: EvrakDurum.arsivlendi, title: 'Arşivlenen Evraklar');
+  const EvrakListePage.durumBekleyen({Key? key})
+      : this._(key: key, durum: EvrakDurum.bekliyor, title: 'Bekleyen Evraklar');
+  const EvrakListePage.durumTeslimEdilen({Key? key})
+      : this._(key: key, durum: EvrakDurum.teslimEdildi, title: 'Teslim Edilen Evraklar');
+  const EvrakListePage.durumArsivlendi({Key? key})
+      : this._(key: key, durum: EvrakDurum.arsivlendi, title: 'Arşivlenen Evraklar');
 
   @override
   State<EvrakListePage> createState() => _EvrakListePageState();
@@ -36,16 +36,35 @@ class _EvrakListePageState extends State<EvrakListePage> {
     _load();
   }
 
+  @override
+  void didUpdateWidget(covariant EvrakListePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.durum != oldWidget.durum) {
+      _page = 1;
+      _load();
+    }
+  }
+
   Future<void> _load() async {
     setState(() => _loading = true);
-    final res = await Services.evrak.listByDurum(widget.durum,
-        page: _page, pageSize: _pageSize);
-    if (!mounted) return;
-    setState(() {
-      _items = res.items;
-      _total = res.total;
-      _loading = false;
-    });
+    try {
+      final res = await Services.evrak.listByDurum(widget.durum,
+          page: _page, pageSize: _pageSize);
+      if (!mounted) return;
+      setState(() {
+        _items = res.items;
+        _total = res.total;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Yükleme hatası: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   @override

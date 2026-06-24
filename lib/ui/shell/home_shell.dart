@@ -36,15 +36,15 @@ class _HomeShellState extends State<HomeShell> {
       case MenuPage.dashboard:
         return DashboardPage(onNavigate: _goTo);
       case MenuPage.yeniEvrak:
-        return const EvrakFormPage();
+        return const EvrakFormPage(key: ValueKey('yeniEvrak'));
       case MenuPage.ara:
-        return EvrakAraPage(hizliArama: _hizliAraCtrl.text);
+        return EvrakAraPage(hizliArama: _hizliAraCtrl.text, key: const ValueKey('ara'));
       case MenuPage.bekleyen:
-        return const EvrakListePage.durumBekleyen();
+        return const EvrakListePage.durumBekleyen(key: ValueKey('bekleyen'));
       case MenuPage.teslimEdilen:
-        return const EvrakListePage.durumTeslimEdilen();
+        return const EvrakListePage.durumTeslimEdilen(key: ValueKey('teslimEdilen'));
       case MenuPage.arsivlenen:
-        return const EvrakListePage.durumArsivlendi();
+        return const EvrakListePage.durumArsivlendi(key: ValueKey('arsivlenen'));
       case MenuPage.raporlar:
         return const RaporlarPage();
       case MenuPage.iceAktarma:
@@ -70,91 +70,101 @@ class _HomeShellState extends State<HomeShell> {
     return Scaffold(
       body: Row(
         children: [
-          // Sol menü
-          NavigationRail(
-            selectedIndex: _selected.index,
-            onDestinationSelected: (i) => _goTo(MenuPage.values[i]),
-            extended: MediaQuery.of(context).size.width > 1100,
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                children: [
-                  Icon(Icons.mark_email_unread,
-                      size: 32, color: theme.colorScheme.primary),
-                  const SizedBox(height: 4),
-                  Text('Tebligat',
-                      style: theme.textTheme.titleSmall
-                          ?.copyWith(fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-            destinations: [
-              for (final p in MenuPage.values)
-                NavigationRailDestination(
-                  icon: Icon(p.icon),
-                  selectedIcon: Icon(p.selectedIcon),
-                  label: Text(p.title),
+          // Sol menü – tüm NavigationRail hedefleri tek bir
+          // FocusTraversal grubuna alınarak form alanlarından önce
+          // odaklanmaları garanti altına alınır.
+          FocusTraversalGroup(
+            child: NavigationRail(
+              selectedIndex: _selected.index,
+              onDestinationSelected: (i) => _goTo(MenuPage.values[i]),
+              extended: MediaQuery.of(context).size.width > 1100,
+              leading: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Column(
+                  children: [
+                    Icon(Icons.mark_email_unread,
+                        size: 32, color: theme.colorScheme.primary),
+                    const SizedBox(height: 4),
+                    Text('Tebligat',
+                        style: theme.textTheme.titleSmall
+                            ?.copyWith(fontWeight: FontWeight.bold)),
+                  ],
                 ),
-            ],
+              ),
+              destinations: [
+                for (final p in MenuPage.values)
+                  NavigationRailDestination(
+                    icon: Icon(p.icon),
+                    selectedIcon: Icon(p.selectedIcon),
+                    label: Text(p.title),
+                  ),
+              ],
+            ),
           ),
           const VerticalDivider(width: 1),
-          // Sağ çalışma alanı
+          // Sağ çalışma alanı – form alanları ve diğer içerik de tek
+          // bir FocusTraversal grubuna alınarak NavigationRail'den
+          // sonra odaklanmaları sağlanır.
           Expanded(
-            child: Column(
-              children: [
-                // Üst bar: hızlı arama + kullanıcı
-                Material(
-                  elevation: 1,
-                  color: theme.appBarTheme.backgroundColor ??
-                      theme.colorScheme.surface,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 520),
-                            child: TextField(
-                              controller: _hizliAraCtrl,
-                              onSubmitted: (_) => _hizliAra(),
-                              decoration: InputDecoration(
-                                hintText: 'Hızlı arama (Ad Soyad / Evrak No)',
-                                prefixIcon: const Icon(Icons.search),
-                                isDense: true,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                  borderSide: BorderSide.none,
+            child: FocusTraversalGroup(
+              child: Column(
+                children: [
+                  // Üst bar: hızlı arama + kullanıcı
+                  Material(
+                    elevation: 1,
+                    color: theme.appBarTheme.backgroundColor ??
+                        theme.colorScheme.surface,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ConstrainedBox(
+                              constraints:
+                                  const BoxConstraints(maxWidth: 520),
+                              child: TextField(
+                                controller: _hizliAraCtrl,
+                                onSubmitted: (_) => _hizliAra(),
+                                decoration: InputDecoration(
+                                  hintText:
+                                      'Hızlı arama (Ad Soyad / Evrak No)',
+                                  prefixIcon: const Icon(Icons.search),
+                                  isDense: true,
+                                  filled: true,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                    borderSide: BorderSide.none,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Chip(
-                          avatar: const Icon(Icons.person, size: 18),
-                          label: Text(
-                            '${user?.adSoyad ?? user?.kullaniciAdi ?? ''} '
-                            '(${user?.rol ?? ""})',
+                          const SizedBox(width: 12),
+                          Chip(
+                            avatar: const Icon(Icons.person, size: 18),
+                            label: Text(
+                              '${user?.adSoyad ?? user?.kullaniciAdi ?? ''} '
+                              '(${user?.rol ?? ""})',
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          tooltip: 'Çıkış',
-                          icon: const Icon(Icons.logout),
-                          onPressed: () async {
-                            await app.logout();
-                          },
-                        ),
-                      ],
+                          IconButton(
+                            tooltip: 'Çıkış',
+                            icon: const Icon(Icons.logout),
+                            onPressed: () async {
+                              await app.logout();
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                // İçerik
-                Expanded(
-                  child: _pageFor(_selected),
-                ),
-              ],
+                  // İçerik
+                  Expanded(
+                    child: _pageFor(_selected),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

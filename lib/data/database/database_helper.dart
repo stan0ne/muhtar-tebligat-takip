@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -12,11 +13,30 @@ class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._();
 
   Database? _db;
+  bool _migrated = false;
 
   /// Veritabanı dosyasının tam yolu.
   Future<String> get dbPath async {
     final dir = await getApplicationSupportDirectory();
-    return p.join(dir.path, AppConstants.dbName);
+    final newPath = p.join(dir.path, AppConstants.dbName);
+
+    // Eski yoldan yeni yola otomatik göç.
+    if (!_migrated) {
+      _migrated = true;
+      try {
+        final oldDir = Directory(p.join(dir.parent.path,
+            'com.muhtar', 'muhtar_tebligat_takip'));
+        final oldFile = File(p.join(oldDir.path, AppConstants.dbName));
+        final newFile = File(newPath);
+        if (await oldFile.exists() && !await newFile.exists()) {
+          await oldFile.copy(newPath);
+        }
+      } catch (_) {
+        // Eski yol yoksa göç gerekmez, sessizce devam et.
+      }
+    }
+
+    return newPath;
   }
 
   /// Veritabanını açar (lazım oluşturur) ve migrasyonları uygular.
