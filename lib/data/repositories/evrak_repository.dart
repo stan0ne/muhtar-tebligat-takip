@@ -119,76 +119,83 @@ class EvrakRepository extends BaseRepository {
       where.write('silindi_mi = 0');
     }
 
-    void addClause(String clause, Object? value) {
-      if (value == null) return;
-      if (value is String && value.isEmpty) return;
-      if (where.isNotEmpty) where.write(' AND ');
-      where.write(clause);
-      args.add(value);
-    }
+    bool hasVal(String? s) => s != null && s.isNotEmpty;
 
-    if (filter.adSoyad != null && filter.adSoyad!.isNotEmpty) {
-      addClause("ad_soyad LIKE ? COLLATE NOCASE", '%${filter.adSoyad}%');
+    if (hasVal(filter.adSoyad)) {
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write('ad_soyad LIKE ? COLLATE NOCASE');
+      args.add('%${filter.adSoyad}%');
     }
-    if (filter.evrakSayisi != null && filter.evrakSayisi!.isNotEmpty) {
-      addClause("evrak_sayisi LIKE ? COLLATE NOCASE", '%${filter.evrakSayisi}%');
+    if (hasVal(filter.evrakSayisi)) {
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write('evrak_sayisi LIKE ? COLLATE NOCASE');
+      args.add('%${filter.evrakSayisi}%');
     }
-    if (filter.geldigiKurum != null && filter.geldigiKurum!.isNotEmpty) {
-      addClause("geldigi_kurum LIKE ? COLLATE NOCASE", '%${filter.geldigiKurum}%');
+    if (hasVal(filter.geldigiKurum)) {
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write('geldigi_kurum LIKE ? COLLATE NOCASE');
+      args.add('%${filter.geldigiKurum}%');
     }
-    if (filter.hizliArama != null && filter.hizliArama!.isNotEmpty) {
-      final q = '%${filter.hizliArama}%';
+    if (hasVal(filter.teslimAlan)) {
       if (where.isNotEmpty) where.write(' AND ');
       where.write(
-        '(ad_soyad LIKE ? COLLATE NOCASE'
-        ' OR evrak_sayisi LIKE ? COLLATE NOCASE'
-        ' OR geldigi_kurum LIKE ? COLLATE NOCASE'
-        ' OR EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = $_table.id'
-        '   AND (t.teslim_alan_ad_soyad LIKE ? COLLATE NOCASE'
-        '        OR t.telefon LIKE ? COLLATE NOCASE))',
-      );
-      args.addAll([q, q, q, q, q]);
-    }
-    if (filter.teslimAlan != null && filter.teslimAlan!.isNotEmpty) {
-      if (where.isNotEmpty) where.write(' AND ');
-      where.write(
-        'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = $_table.id'
+        'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
         ' AND t.teslim_alan_ad_soyad LIKE ? COLLATE NOCASE)',
       );
       args.add('%${filter.teslimAlan}%');
     }
-    if (filter.telefon != null && filter.telefon!.isNotEmpty) {
+    if (hasVal(filter.telefon)) {
       if (where.isNotEmpty) where.write(' AND ');
       where.write(
-        'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = $_table.id'
+        'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
         ' AND t.telefon LIKE ? COLLATE NOCASE)',
       );
       args.add('%${filter.telefon}%');
     }
-    addClause("durum = ?", filter.durum);
-    if (filter.tarihBaslangic != null && filter.tarihBaslangic!.isNotEmpty) {
-      addClause("gelis_tarihi >= ?", filter.tarihBaslangic);
+    if (hasVal(filter.hizliArama)) {
+      final q = '%${filter.hizliArama}%';
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write('('
+          'ad_soyad LIKE ? COLLATE NOCASE'
+          ' OR evrak_sayisi LIKE ? COLLATE NOCASE'
+          ' OR geldigi_kurum LIKE ? COLLATE NOCASE'
+          ' OR EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
+          '   AND (t.teslim_alan_ad_soyad LIKE ? COLLATE NOCASE'
+          '        OR t.telefon LIKE ? COLLATE NOCASE))'
+          ')');
+      args.addAll([q, q, q, q, q]);
     }
-    if (filter.tarihBitis != null && filter.tarihBitis!.isNotEmpty) {
-      addClause("gelis_tarihi < ?", '${filter.tarihBitis} 23:59:59');
+    if (hasVal(filter.durum)) {
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write('durum = ?');
+      args.add(filter.durum);
+    }
+    if (hasVal(filter.tarihBaslangic)) {
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write('gelis_tarihi >= ?');
+      args.add(filter.tarihBaslangic);
+    }
+    if (hasVal(filter.tarihBitis)) {
+      if (where.isNotEmpty) where.write(' AND ');
+      where.write('gelis_tarihi < ?');
+      args.add('${filter.tarihBitis} 23:59:59');
     }
 
     final whereStr = where.toString();
     final offset = (page - 1) * pageSize;
     final effectiveOffset = offset < 0 ? 0 : offset;
 
-    // rawQuery kullanarak database.query() olası sorunlarını eleyelim.
-    final countSql =
-        'SELECT COUNT(*) AS c FROM $_table${whereStr.isEmpty ? '' : ' WHERE $whereStr'}';
-    final dataSql =
-        'SELECT * FROM $_table${whereStr.isEmpty ? '' : ' WHERE $whereStr'}'
+    final whereClause = whereStr.isEmpty ? '' : ' WHERE $whereStr';
+    final countSql = 'SELECT COUNT(*) AS c FROM Evraklar$whereClause';
+    final dataSql = 'SELECT * FROM Evraklar$whereClause'
         ' ORDER BY olusturma_tarihi DESC, id DESC'
         ' LIMIT $pageSize OFFSET $effectiveOffset';
 
-    final countRows = await database.rawQuery(countSql, args.isEmpty ? null : args);
+    final dynamicParams = args.isEmpty ? null : args;
+    final countRows = await database.rawQuery(countSql, dynamicParams);
     final total = (countRows.first['c'] as int?) ?? 0;
 
-    final rows = await database.rawQuery(dataSql, args.isEmpty ? null : args);
+    final rows = await database.rawQuery(dataSql, dynamicParams);
 
     final items = rows.map(Evrak.fromMap).toList();
     return PagedResult(items: items, total: total, page: page, pageSize: pageSize);
