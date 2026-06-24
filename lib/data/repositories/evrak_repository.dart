@@ -252,6 +252,38 @@ class EvrakRepository extends BaseRepository {
     return update(updated);
   }
 
+  /// Birden fazla evrakı ID ile getir.
+  Future<List<Evrak>> getByIds(List<int> ids) async {
+    if (ids.isEmpty) return [];
+    final database = await db;
+    final placeholders = ids.map((_) => '?').join(',');
+    final rows = await database.query(
+      _table,
+      where: 'id IN ($placeholders)',
+      whereArgs: ids,
+    );
+    return rows.map(Evrak.fromMap).toList();
+  }
+
+  /// Toplu durum güncelleme (transaction içinde).
+  Future<void> setDurumToplu(List<int> ids, String durum, {String? teslimTarihi}) async {
+    if (ids.isEmpty) return;
+    final database = await db;
+    final now = DateTime.now().toIso8601String();
+    await database.transaction((txn) async {
+      for (final id in ids) {
+        final existing = await getById(id, includeDeleted: true);
+        if (existing == null) continue;
+        final updated = existing.copyWith(
+          durum: durum,
+          teslimTarihi: teslimTarihi ?? existing.teslimTarihi,
+          guncellemeTarihi: now,
+        );
+        await txn.update(_table, updated.toMap(), where: 'id = ?', whereArgs: [id]);
+      }
+    });
+  }
+
   /// Yumuşak silme (silindi_mi = 1).
   Future<int> softDelete(int id) async {
     final existing = await getById(id, includeDeleted: true);

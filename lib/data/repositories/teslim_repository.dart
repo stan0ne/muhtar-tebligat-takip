@@ -32,4 +32,14 @@ class TeslimRepository extends BaseRepository {
     if (rows.isEmpty) return null;
     return TeslimKaydi.fromMap(rows.first);
   }
+
+  /// Toplu insert (transaction içinde).
+  Future<void> insertBatch(List<TeslimKaydi> kayitlar) async {
+    final database = await db;
+    await database.transaction((txn) async {
+      for (final kayit in kayitlar) {
+        await txn.insert(_table, kayit.toMap());
+      }
+    });
+  }
 }

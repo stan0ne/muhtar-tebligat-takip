@@ -4,6 +4,7 @@ import '../../../data/models/evrak.dart';
 import '../../widgets/ui_util.dart';
 
 /// Evrak tablosu (DataGrid benzeri). Çift tıklama detay açar.
+/// Opsiyonel çoklu seçim desteği.
 class EvrakDataTable extends StatelessWidget {
   final List<Evrak> items;
   final int total;
@@ -11,6 +12,8 @@ class EvrakDataTable extends StatelessWidget {
   final int pageSize;
   final ValueChanged<int> onPage;
   final ValueChanged<Evrak> onRowTap;
+  final Set<int>? selectedIds;
+  final ValueChanged<Set<int>>? onSelectionChanged;
 
   const EvrakDataTable({
     super.key,
@@ -20,15 +23,21 @@ class EvrakDataTable extends StatelessWidget {
     required this.pageSize,
     required this.onPage,
     required this.onRowTap,
+    this.selectedIds,
+    this.onSelectionChanged,
   });
 
   int get _totalPages =>
       pageSize <= 0 ? 1 : ((total + pageSize - 1) ~/ pageSize);
 
+  bool get _isMultiSelect => selectedIds != null && onSelectionChanged != null;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final columns = const ['Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', 'Geliş Tarihi', 'Durum'];
+    final columns = _isMultiSelect
+        ? const ['', 'Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', 'Geliş Tarihi', 'Durum']
+        : const ['Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', 'Geliş Tarihi', 'Durum'];
 
     return Column(
       children: [
@@ -46,8 +55,32 @@ class EvrakDataTable extends StatelessWidget {
                       rows: [
                         for (final e in items)
                           DataRow(
-                            onSelectChanged: (_) => onRowTap(e),
+                            selected: _isMultiSelect && selectedIds!.contains(e.id),
+                            onSelectChanged: _isMultiSelect
+                                ? (val) {
+                                    final newSet = Set<int>.from(selectedIds!);
+                                    if (val == true) {
+                                      newSet.add(e.id!);
+                                    } else {
+                                      newSet.remove(e.id!);
+                                    }
+                                    onSelectionChanged!(newSet);
+                                  }
+                                : (_) => onRowTap(e),
                             cells: [
+                              if (_isMultiSelect)
+                                DataCell(Checkbox(
+                                  value: selectedIds!.contains(e.id),
+                                  onChanged: (val) {
+                                    final newSet = Set<int>.from(selectedIds!);
+                                    if (val == true) {
+                                      newSet.add(e.id!);
+                                    } else {
+                                      newSet.remove(e.id!);
+                                    }
+                                    onSelectionChanged!(newSet);
+                                  },
+                                )),
                               DataCell(Text(e.adSoyad)),
                               DataCell(Text(e.geldigiKurum ?? '-')),
                               DataCell(Text(e.evrakSayisi ?? '-')),

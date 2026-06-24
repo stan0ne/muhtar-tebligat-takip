@@ -4,6 +4,7 @@ import '../../data/models/evrak.dart';
 import '../../services/log_service.dart';
 import '../pages/evrak_detail_page.dart';
 import 'widgets/evrak_data_table.dart';
+import 'widgets/teslim_dialog.dart';
 
 /// Duruma göre filtreli liste (Bekleyen / Teslim Edilen / Arşivlenen).
 class EvrakListePage extends StatefulWidget {
@@ -29,6 +30,9 @@ class _EvrakListePageState extends State<EvrakListePage> {
   int _page = 1;
   final int _pageSize = AppConstants.defaultPageSize;
   bool _loading = true;
+  final Set<int> _selectedIds = {};
+
+  bool get _isBekleyen => widget.durum == EvrakDurum.bekliyor;
 
   @override
   void initState() {
@@ -41,6 +45,7 @@ class _EvrakListePageState extends State<EvrakListePage> {
     super.didUpdateWidget(oldWidget);
     if (widget.durum != oldWidget.durum) {
       _page = 1;
+      _selectedIds.clear();
       _load();
     }
   }
@@ -67,8 +72,21 @@ class _EvrakListePageState extends State<EvrakListePage> {
     }
   }
 
+  Future<void> _teslimEtSecilenleri() async {
+    if (_selectedIds.isEmpty) return;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => TeslimDialog(evrakIds: _selectedIds.toList()),
+    );
+    if (result == true) {
+      _selectedIds.clear();
+      _load();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Padding(
@@ -76,8 +94,31 @@ class _EvrakListePageState extends State<EvrakListePage> {
           child: Row(
             children: [
               Text(widget.title,
-                  style: Theme.of(context).textTheme.titleLarge),
+                  style: theme.textTheme.titleLarge),
               const Spacer(),
+              if (_isBekleyen && _selectedIds.isNotEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    '${_selectedIds.length} seçili',
+                    style: TextStyle(
+                      color: theme.colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                FilledButton.icon(
+                  onPressed: _teslimEtSecilenleri,
+                  icon: const Icon(Icons.how_to_reg),
+                  label: const Text('Seçilenleri Teslim Et'),
+                ),
+                const SizedBox(width: 8),
+              ],
               IconButton(
                 tooltip: 'Yenile',
                 icon: const Icon(Icons.refresh),
@@ -104,6 +145,13 @@ class _EvrakListePageState extends State<EvrakListePage> {
                     ));
                     _load();
                   },
+                  selectedIds: _isBekleyen ? _selectedIds : null,
+                  onSelectionChanged: _isBekleyen
+                      ? (ids) => setState(() {
+                            _selectedIds.clear();
+                            _selectedIds.addAll(ids);
+                          })
+                      : null,
                 ),
         ),
       ],

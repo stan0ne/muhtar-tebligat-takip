@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../services/log_service.dart';
 
-/// Teslim alma diyaloğu.
+/// Teslim alma diyaloğu — tekli ve toplu teslim desteği.
 class TeslimDialog extends StatefulWidget {
-  final int evrakId;
-  const TeslimDialog({super.key, required this.evrakId});
+  final int? evrakId;
+  final List<int>? evrakIds;
+  const TeslimDialog({super.key, this.evrakId, this.evrakIds})
+      : assert(evrakId != null || (evrakIds != null && evrakIds!.isNotEmpty));
 
   @override
   State<TeslimDialog> createState() => _TeslimDialogState();
@@ -17,6 +19,9 @@ class _TeslimDialogState extends State<TeslimDialog> {
   final _telCtrl = TextEditingController();
   final _aciklamaCtrl = TextEditingController();
   bool _saving = false;
+
+  bool get _isToplu => widget.evrakIds != null && widget.evrakIds!.length > 1;
+  int get _evrakSayisi => _isToplu ? widget.evrakIds!.length : 1;
 
   @override
   void dispose() {
@@ -31,16 +36,28 @@ class _TeslimDialogState extends State<TeslimDialog> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     try {
-      await Services.evrak.teslimEt(
-        evrakId: widget.evrakId,
-        teslimAlanAdSoyad: _alanCtrl.text,
-        tcKimlikNo: _tcCtrl.text,
-        telefon: _telCtrl.text,
-        aciklama: _aciklamaCtrl.text,
-      );
+      if (_isToplu) {
+        await Services.evrak.teslimEtToplu(
+          evrakIds: widget.evrakIds!,
+          teslimAlanAdSoyad: _alanCtrl.text,
+          tcKimlikNo: _tcCtrl.text,
+          telefon: _telCtrl.text,
+          aciklama: _aciklamaCtrl.text,
+        );
+      } else {
+        await Services.evrak.teslimEt(
+          evrakId: widget.evrakId!,
+          teslimAlanAdSoyad: _alanCtrl.text,
+          tcKimlikNo: _tcCtrl.text,
+          telefon: _telCtrl.text,
+          aciklama: _aciklamaCtrl.text,
+        );
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Teslim edildi olarak kaydedildi.')),
+          SnackBar(content: Text(_isToplu
+              ? '$_evrakSayisi evrak teslim edildi.'
+              : 'Teslim edildi olarak kaydedildi.')),
         );
         Navigator.of(context).pop(true);
       }
@@ -58,7 +75,7 @@ class _TeslimDialogState extends State<TeslimDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Teslim Et'),
+      title: Text(_isToplu ? '$_evrakSayisi Evrakı Teslim Et' : 'Teslim Et'),
       content: SizedBox(
         width: 420,
         child: Form(
@@ -67,6 +84,30 @@ class _TeslimDialogState extends State<TeslimDialog> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (_isToplu) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline,
+                            color: Theme.of(context).colorScheme.primary),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '$_evrakSayisi adet bekleyen evrak aynı anda teslim edilecek.',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 TextFormField(
                   controller: _alanCtrl,
                   textCapitalization: TextCapitalization.words,
@@ -117,7 +158,13 @@ class _TeslimDialogState extends State<TeslimDialog> {
         ),
         FilledButton(
           onPressed: _saving ? null : _save,
-          child: const Text('Kaydet'),
+          child: _saving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              : const Text('Kaydet'),
         ),
       ],
     );

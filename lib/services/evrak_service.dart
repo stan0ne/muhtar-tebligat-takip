@@ -103,6 +103,44 @@ class EvrakService {
     }
   }
 
+  /// Toplu teslim: birden fazla evrakı aynı anda teslim eder.
+  Future<void> teslimEtToplu({
+    required List<int> evrakIds,
+    required String teslimAlanAdSoyad,
+    String? tcKimlikNo,
+    String? telefon,
+    String? aciklama,
+  }) async {
+    final teslimTarihi = DateUtil.nowIso();
+    final kayitlar = <TeslimKaydi>[];
+
+    for (final id in evrakIds) {
+      final evrak = await _repo.getById(id);
+      if (evrak == null) continue;
+
+      kayitlar.add(TeslimKaydi(
+        evrakId: id,
+        teslimAlanAdSoyad: teslimAlanAdSoyad.trim(),
+        tcKimlikNo: tcKimlikNo?.trim().isEmpty == true ? null : tcKimlikNo?.trim(),
+        telefon: telefon?.trim().isEmpty == true ? null : telefon?.trim(),
+        teslimTarihi: teslimTarihi,
+        aciklama: aciklama?.trim().isEmpty == true ? null : aciklama?.trim(),
+        olusturmaTarihi: teslimTarihi,
+      ));
+    }
+
+    await _repo.setDurumToplu(evrakIds, EvrakDurum.teslimEdildi, teslimTarihi: teslimTarihi);
+    await _teslimRepo.insertBatch(kayitlar);
+
+    for (final id in evrakIds) {
+      final evrak = await _repo.getById(id, includeDeleted: true);
+      await Services.log.log(LogIslem.evrakTeslim,
+          hedefTablo: 'Evraklar',
+          hedefId: id,
+          aciklama: '${evrak?.adSoyad} -> $teslimAlanAdSoyad');
+    }
+  }
+
   /// Yumuşak silme.
   Future<void> sil(int evrakId) async {
     await _repo.softDelete(evrakId);
