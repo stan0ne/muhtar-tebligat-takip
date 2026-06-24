@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:path/path.dart' as p;
 import '../../core/constants.dart';
 import '../../services/log_service.dart';
+import '../../services/cloud_backup_service.dart';
 import '../providers/app_provider.dart';
 
 /// Yedekleme / geri yükleme / otomatik yedek ayarları.
@@ -152,6 +153,18 @@ class _YedeklemePageState extends State<YedeklemePage> {
     }
   }
 
+  Future<void> _connectCloud(String provider) async {
+    // Gerçek uygulamada OAuth 2.0 akışı başlatılır
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$provider entegrasyonu henüz tamamlanmadı. Yakında eklenecek.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
@@ -292,6 +305,64 @@ class _YedeklemePageState extends State<YedeklemePage> {
                       },
                     ),
                   ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // --- Bulut Yedekleme ---
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.cloud, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Bulut Yedekleme', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Google Drive veya OneDrive hesabınıza yedek alabilirsiniz.',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      // Google Drive
+                      Expanded(
+                        child: Card(
+                          child: ListTile(
+                            leading: const Icon(Icons.cloud_upload, color: Colors.blue),
+                            title: const Text('Google Drive'),
+                            subtitle: const Text('Google hesabınıza yedekleyin'),
+                            trailing: FilledButton.tonal(
+                              onPressed: () => _connectCloud('google'),
+                              child: const Text('Bağlan'),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // OneDrive
+                      Expanded(
+                        child: Card(
+                          child: ListTile(
+                            leading: const Icon(Icons.cloud_upload, color: Colors.blueAccent),
+                            title: const Text('OneDrive'),
+                            subtitle: const Text('Microsoft hesabınıza yedekleyin'),
+                            trailing: FilledButton.tonal(
+                              onPressed: () => _connectCloud('onedrive'),
+                              child: const Text('Bağlan'),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

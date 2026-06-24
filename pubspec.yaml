@@ -37,6 +37,11 @@ dependencies:
   # Dosya seçimi (yedek geri yükleme, içe aktarma)
   file_picker: ^8.1.2
 
+  # Bulut yedekleme
+  googleapis: ^13.2.0
+  googleapis_auth: ^1.6.0
+  http: ^1.2.2
+
   # Tarih/format
   intl: ^0.19.0
 
