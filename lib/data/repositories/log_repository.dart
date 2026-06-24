@@ -30,4 +30,23 @@ class LogRepository extends BaseRepository {
     final rows = await database.rawQuery('SELECT COUNT(*) AS c FROM $_table');
     return (rows.first['c'] as int?) ?? 0;
   }
+
+  /// Belirli tarihten eski logları sil.
+  Future<int> deleteOlderThan(String tarih) async {
+    final database = await db;
+    return database.delete(_table, where: 'tarih < ?', whereArgs: [tarih]);
+  }
+
+  /// Tüm logları sil.
+  Future<int> deleteAll() async {
+    final database = await db;
+    return database.delete(_table);
+  }
+
+  /// En eski log tarihini getir.
+  Future<String?> getOldestDate() async {
+    final database = await db;
+    final rows = await database.rawQuery('SELECT MIN(tarih) AS t FROM $_table');
+    return rows.first['t'] as String?;
+  }
 }

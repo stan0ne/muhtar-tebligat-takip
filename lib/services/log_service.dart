@@ -43,6 +43,14 @@ class LogService {
   Future<List<LogEntry>> list({int limit = 200, int offset = 0}) =>
       _repo.list(limit: limit, offset: offset);
 
+  Future<int> count() => _repo.count();
+
+  Future<int> deleteOlderThan(String tarih) => _repo.deleteOlderThan(tarih);
+
+  Future<int> deleteAll() => _repo.deleteAll();
+
+  Future<String?> getOldestDate() => _repo.getOldestDate();
+
   Future<void> logLogin(User user) => log(LogIslem.kullaniciGiris,
       hedefTablo: 'Kullanicilar', hedefId: user.id, aciklama: user.kullaniciAdi);
   Future<void> logLogout(User user) => log(LogIslem.kullaniciCikis,

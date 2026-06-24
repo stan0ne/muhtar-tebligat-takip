@@ -23,11 +23,18 @@ class _AyarlarPageState extends State<AyarlarPage> {
   final _ilceCtrl = TextEditingController();
   bool _saving = false;
 
+  // Log yönetimi
+  int _logCount = 0;
+  String? _oldestLogDate;
+  final _gunCtrl = TextEditingController(text: '90');
+  bool _cleaning = false;
+
   @override
   void initState() {
     super.initState();
     _loadUsers();
     _loadMuhtarlik();
+    _loadLogStats();
   }
 
   @override
@@ -36,6 +43,7 @@ class _AyarlarPageState extends State<AyarlarPage> {
     _muhtarAdSoyadCtrl.dispose();
     _ilCtrl.dispose();
     _ilceCtrl.dispose();
+    _gunCtrl.dispose();
     super.dispose();
   }
 
@@ -61,6 +69,70 @@ class _AyarlarPageState extends State<AyarlarPage> {
       setState(() => _saving = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Muhtarlık bilgileri kaydedildi.')),
+      );
+    }
+  }
+
+  Future<void> _loadLogStats() async {
+    final count = await Services.log.count();
+    final oldest = await Services.log.getOldestDate();
+    if (mounted) setState(() { _logCount = count; _oldestLogDate = oldest; });
+  }
+
+  Future<void> _cleanOldLogs() async {
+    final gun = int.tryParse(_gunCtrl.text.trim());
+    if (gun == null || gun < 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Geçerli bir gün sayısı girin.')),
+      );
+      return;
+    }
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Log Temizleme'),
+        content: Text('$gun günden eski tüm loglar silinecek. Emin misiniz?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Temizle')),
+        ],
+      ),
+    );
+    if (onay != true) return;
+
+    setState(() => _cleaning = true);
+    final tarih = DateTime.now().subtract(Duration(days: gun)).toIso8601String();
+    final silinen = await Services.log.deleteOlderThan(tarih);
+    await _loadLogStats();
+    if (mounted) {
+      setState(() => _cleaning = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$silinen log kaydı silindi.')),
+      );
+    }
+  }
+
+  Future<void> _cleanAllLogs() async {
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Tüm Logları Sil'),
+        content: const Text('Tüm işlem logları silinecek. Bu işlem geri alınamaz. Emin misiniz?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Sil')),
+        ],
+      ),
+    );
+    if (onay != true) return;
+
+    setState(() => _cleaning = true);
+    final silinen = await Services.log.deleteAll();
+    await _loadLogStats();
+    if (mounted) {
+      setState(() => _cleaning = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$silinen log kaydı silindi.')),
       );
     }
   }
@@ -235,6 +307,69 @@ class _AyarlarPageState extends State<AyarlarPage> {
               onTap: () => showDialog(
                 context: context,
                 builder: (_) => const LogViewerDialog(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // --- Log Yönetimi ---
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Log Yönetimi', style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Icon(Icons.info_outline, size: 16, color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                      const SizedBox(width: 8),
+                      Text('Toplam $_logCount log kaydı'),
+                      if (_oldestLogDate != null) ...[
+                        const SizedBox(width: 16),
+                        Icon(Icons.access_time, size: 16, color: theme.colorScheme.onSurface.withOpacity(0.6)),
+                        const SizedBox(width: 8),
+                        Text('En eski: ${_oldestLogDate!.substring(0, 10)}'),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        child: TextField(
+                          controller: _gunCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Gün',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('günden eski logları temizle'),
+                      const Spacer(),
+                      FilledButton.tonalIcon(
+                        onPressed: _cleaning ? null : _cleanOldLogs,
+                        icon: _cleaning
+                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Icon(Icons.cleaning_services),
+                        label: const Text('Temizle'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: OutlinedButton.icon(
+                      onPressed: _cleaning ? null : _cleanAllLogs,
+                      icon: const Icon(Icons.delete_forever, color: Colors.red),
+                      label: const Text('Tüm Logları Sil', style: TextStyle(color: Colors.red)),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
