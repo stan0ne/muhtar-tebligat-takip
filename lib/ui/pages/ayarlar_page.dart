@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/constants.dart';
 import '../../data/models/user.dart';
 import '../../services/log_service.dart';
 import '../providers/app_provider.dart';
@@ -237,6 +238,16 @@ class _AyarlarPageState extends State<AyarlarPage> {
               ),
             ),
           ),
+          const SizedBox(height: 24),
+          Center(
+            child: Text(
+              'v${AppConstants.appVersion}',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.4),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
         ],
       ),
     );

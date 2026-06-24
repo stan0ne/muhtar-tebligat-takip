@@ -21,6 +21,7 @@ class _HomeShellState extends State<HomeShell> {
   MenuPage _selected = MenuPage.dashboard;
   final _hizliAraCtrl = TextEditingController();
   int _araKey = 0;
+  String _hizliAramaDeger = '';
 
   @override
   void dispose() {
@@ -40,7 +41,7 @@ class _HomeShellState extends State<HomeShell> {
       case MenuPage.yeniEvrak:
         return const EvrakFormPage(key: ValueKey('yeniEvrak'));
       case MenuPage.ara:
-        return EvrakAraPage(hizliArama: _hizliAraCtrl.text, key: ValueKey('ara-$_araKey'));
+        return EvrakAraPage(hizliArama: _hizliAramaDeger, key: ValueKey('ara-$_araKey'));
       case MenuPage.bekleyen:
         return const EvrakListePage.durumBekleyen(key: ValueKey('bekleyen'));
       case MenuPage.teslimEdilen:
@@ -60,11 +61,12 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _hizliAra() async {
     if (_hizliAraCtrl.text.trim().isEmpty) return;
+    _hizliAramaDeger = _hizliAraCtrl.text.trim();
+    _hizliAraCtrl.clear();
     setState(() {
       _araKey++;
       _selected = MenuPage.ara;
     });
-    _hizliAraCtrl.clear();
   }
 
   @override
