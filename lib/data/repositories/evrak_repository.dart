@@ -120,48 +120,49 @@ class EvrakRepository extends BaseRepository {
     }
 
     bool hasVal(String? s) => s != null && s.isNotEmpty;
+    String toLower(String s) => s.toLowerCase();
 
     if (hasVal(filter.adSoyad)) {
       if (where.isNotEmpty) where.write(' AND ');
-      where.write('ad_soyad LIKE ? COLLATE NOCASE');
-      args.add('%${filter.adSoyad}%');
+      where.write('LOWER(ad_soyad) LIKE ?');
+      args.add('%${toLower(filter.adSoyad!)}%');
     }
     if (hasVal(filter.evrakSayisi)) {
       if (where.isNotEmpty) where.write(' AND ');
-      where.write('evrak_sayisi LIKE ? COLLATE NOCASE');
-      args.add('%${filter.evrakSayisi}%');
+      where.write('LOWER(evrak_sayisi) LIKE ?');
+      args.add('%${toLower(filter.evrakSayisi!)}%');
     }
     if (hasVal(filter.geldigiKurum)) {
       if (where.isNotEmpty) where.write(' AND ');
-      where.write('geldigi_kurum LIKE ? COLLATE NOCASE');
-      args.add('%${filter.geldigiKurum}%');
+      where.write('LOWER(geldigi_kurum) LIKE ?');
+      args.add('%${toLower(filter.geldigiKurum!)}%');
     }
     if (hasVal(filter.teslimAlan)) {
       if (where.isNotEmpty) where.write(' AND ');
       where.write(
         'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
-        ' AND t.teslim_alan_ad_soyad LIKE ? COLLATE NOCASE)',
+        ' AND LOWER(t.teslim_alan_ad_soyad) LIKE ?)',
       );
-      args.add('%${filter.teslimAlan}%');
+      args.add('%${toLower(filter.teslimAlan!)}%');
     }
     if (hasVal(filter.telefon)) {
       if (where.isNotEmpty) where.write(' AND ');
       where.write(
         'EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
-        ' AND t.telefon LIKE ? COLLATE NOCASE)',
+        ' AND LOWER(t.telefon) LIKE ?)',
       );
-      args.add('%${filter.telefon}%');
+      args.add('%${toLower(filter.telefon!)}%');
     }
     if (hasVal(filter.hizliArama)) {
-      final q = '%${filter.hizliArama}%';
+      final q = '%${toLower(filter.hizliArama!)}%';
       if (where.isNotEmpty) where.write(' AND ');
       where.write('('
-          'ad_soyad LIKE ? COLLATE NOCASE'
-          ' OR evrak_sayisi LIKE ? COLLATE NOCASE'
-          ' OR geldigi_kurum LIKE ? COLLATE NOCASE'
+          'LOWER(ad_soyad) LIKE ?'
+          ' OR LOWER(evrak_sayisi) LIKE ?'
+          ' OR LOWER(geldigi_kurum) LIKE ?'
           ' OR EXISTS (SELECT 1 FROM TeslimKayitlari t WHERE t.evrak_id = Evraklar.id'
-          '   AND (t.teslim_alan_ad_soyad LIKE ? COLLATE NOCASE'
-          '        OR t.telefon LIKE ? COLLATE NOCASE))'
+          '   AND (LOWER(t.teslim_alan_ad_soyad) LIKE ?'
+          '        OR LOWER(t.telefon) LIKE ?))'
           ')');
       args.addAll([q, q, q, q, q]);
     }
