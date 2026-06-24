@@ -7,8 +7,23 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
 ### Beklenen
 - Türkçe karakter duyarsız arama (FTS5 / ICU collation)
-- Log arşivleme / otomatik temizleme
 - Tarih aralığı raporlarında grafik görselleştirme
+- Bulut yedekleme OAuth 2.0 akışı (Google Drive / OneDrive)
+
+---
+
+## [1.3.0] — 2026-06-24
+
+### Eklendi
+- **Log arşivleme/temizleme**: Ayarlar sayfasına Log Yönetimi paneli eklendi. Toplam log sayısı, en eski log tarihi, X günden eski logları temizle, tüm logları sil seçenekleri.
+- **Toplu teslim**: Bekleyen Evraklar listesinde çoklu seçim ile birden fazla evrakı aynı anda tek teslim kaydıyla teslim etme desteği.
+- **Durum geçmişi**: Evrakların durum değişiklikleri zaman çizelgesi ile takip ediliyor (Bekliyor → Teslim Edildi → Arşivlendi). Veritabanı v2'ye yükseltildi.
+- **Harici yedekleme konumu**: Yedekleme sayfasına harici dizin seçimi eklendi (D:\backup\ gibi). Seçilen konuma yedek alma ve o konumdan geri yükleme desteği.
+- **Bulut yedekleme**: Google Drive ve OneDrive entegrasyonu için temel yapı oluşturuldu. Arayüz hazır, OAuth 2.0 akışı yakında eklenecek.
+
+### Değişti
+- Veritabanı sürümü 1 → 2'ye yükseltildi (DurumGecmisleri tablosu eklendi).
+- Yedekleme sayfası yeniden yapılandırıldı (Dahili, Harici, Bulut bölümleri).
 
 ---
 
