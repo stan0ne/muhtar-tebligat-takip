@@ -219,7 +219,7 @@ class EvrakRepository extends BaseRepository {
     final whereClause = whereStr.isEmpty ? '' : ' WHERE $whereStr';
     final countSql = 'SELECT COUNT(*) AS c FROM Evraklar$whereClause';
     final dataSql = 'SELECT * FROM Evraklar$whereClause'
-        ' ORDER BY olusturma_tarihi DESC, id DESC'
+        ' ORDER BY gelis_tarihi DESC, id DESC'
         ' LIMIT $pageSize OFFSET $effectiveOffset';
 
     final dynamicParams = args.isEmpty ? null : args;
