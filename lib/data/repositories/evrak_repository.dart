@@ -285,23 +285,35 @@ class EvrakRepository extends BaseRepository {
     if (ids.isEmpty) return;
     final database = await db;
     final now = DateTime.now().toIso8601String();
+
+    // Önce tüm evrakları transaction dışında oku (deadlock önleme)
+    final evraklar = <int, Evrak>{};
+    for (final id in ids) {
+      final existing = await getById(id, includeDeleted: true);
+      if (existing != null) evraklar[id] = existing;
+    }
+
+    // Durum değişikliklerini transaction dışında logla
     final gecmisRepo = DurumGecmisiRepository();
+    for (final id in ids) {
+      final existing = evraklar[id];
+      if (existing == null) continue;
+      if (existing.durum != durum) {
+        await gecmisRepo.insert(DurumGecmisi(
+          evrakId: id,
+          eskiDurum: existing.durum,
+          yeniDurum: durum,
+          degisiklikTarihi: now,
+          aciklama: aciklama,
+        ));
+      }
+    }
+
+    // Sadece update işlemlerini transaction içinde yap
     await database.transaction((txn) async {
       for (final id in ids) {
-        final existing = await getById(id, includeDeleted: true);
+        final existing = evraklar[id];
         if (existing == null) continue;
-
-        // Durum değişikliğini kaydet
-        if (existing.durum != durum) {
-          await gecmisRepo.insert(DurumGecmisi(
-            evrakId: id,
-            eskiDurum: existing.durum,
-            yeniDurum: durum,
-            degisiklikTarihi: now,
-            aciklama: aciklama,
-          ));
-        }
-
         final updated = existing.copyWith(
           durum: durum,
           teslimTarihi: teslimTarihi ?? existing.teslimTarihi,
