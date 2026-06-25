@@ -330,6 +330,91 @@ class EvrakRepository extends BaseRepository {
     return gecmisRepo.listForEvrak(evrakId);
   }
 
+  /// Otomatik arşivleme için uygun evrakları bul:
+  /// - durum = 'Bekliyor'
+  /// - prevYearsOnly = true ise: gelis_tarihi geçmiş yıla ait (bu yıl değil)
+  /// - gelis_tarihi belirtilen ay sayısından eski
+  Future<List<Evrak>> findAutoArchiveCandidates({
+    int monthsOld = 3,
+    bool prevYearsOnly = true,
+  }) async {
+    final database = await db;
+    final now = DateTime.now();
+    final currentYear = now.year;
+    final thresholdDate = DateTime(now.year, now.month - monthsOld, now.day);
+    final thresholdStr = thresholdDate.toIso8601String().substring(0, 10);
+    final yearStart = '$currentYear-01-01';
+
+    String query;
+    List<dynamic> args;
+
+    if (prevYearsOnly) {
+      query = '''
+        SELECT * FROM Evraklar
+        WHERE durum = 'Bekliyor'
+          AND silindi_mi = 0
+          AND gelis_tarihi < ?
+          AND gelis_tarihi < ?
+        ORDER BY gelis_tarihi ASC
+      ''';
+      args = [yearStart, thresholdStr];
+    } else {
+      query = '''
+        SELECT * FROM Evraklar
+        WHERE durum = 'Bekliyor'
+          AND silindi_mi = 0
+          AND gelis_tarihi < ?
+        ORDER BY gelis_tarihi ASC
+      ''';
+      args = [thresholdStr];
+    }
+
+    final rows = await database.rawQuery(query, args);
+    return rows.map(Evrak.fromMap).toList();
+  }
+
+  /// Otomatik arşivleme önizleme detayı (hafif sorgu).
+  Future<List<Map<String, dynamic>>> findAutoArchivePreview({
+    int monthsOld = 3,
+    bool prevYearsOnly = true,
+  }) async {
+    final database = await db;
+    final now = DateTime.now();
+    final currentYear = now.year;
+    final thresholdDate = DateTime(now.year, now.month - monthsOld, now.day);
+    final thresholdStr = thresholdDate.toIso8601String().substring(0, 10);
+    final yearStart = '$currentYear-01-01';
+
+    String query;
+    List<dynamic> args;
+
+    if (prevYearsOnly) {
+      query = '''
+        SELECT id, evrak_sayisi, ad_soyad, geldigi_kurum, gelis_tarihi
+        FROM Evraklar
+        WHERE durum = 'Bekliyor'
+          AND silindi_mi = 0
+          AND gelis_tarihi < ?
+          AND gelis_tarihi < ?
+        ORDER BY gelis_tarihi ASC
+      ''';
+      args = [yearStart, thresholdStr];
+    } else {
+      query = '''
+        SELECT id, evrak_sayisi, ad_soyad, geldigi_kurum, gelis_tarihi
+        FROM Evraklar
+        WHERE durum = 'Bekliyor'
+          AND silindi_mi = 0
+          AND gelis_tarihi < ?
+        ORDER BY gelis_tarihi ASC
+      ''';
+      args = [thresholdStr];
+    }
+
+    final rows = await database.rawQuery(query, args);
+    return rows;
+  }
+
   /// Yumuşak silme (silindi_mi = 1).
   Future<int> softDelete(int id) async {
     final existing = await getById(id, includeDeleted: true);

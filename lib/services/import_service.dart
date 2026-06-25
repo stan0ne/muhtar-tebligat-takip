@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:excel/excel.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import '../core/constants.dart';
 import '../core/date_util.dart';
 import 'log_service.dart';
@@ -40,6 +42,58 @@ class ImportResult {
 /// Tarih, Ad Soyad, Geldiği Yer, Sayı, T.C. Kimlik No, Telefon No, Evrakı Alan
 /// (ikinci "Tarih" kolonu teslim tarihi olarak yorumlanır).
 class ImportService {
+  /// Boş Excel şablonu oluşturur ve dosya yolunu döndürür.
+  Future<String> createTemplate() async {
+    final excel = Excel.createExcel();
+    final sheet = excel['Sheet1'];
+
+    // Başlık satırı
+    final headers = [
+      'Tarih',
+      'Ad Soyad',
+      'Geldiği Yer',
+      'Sayı',
+      'T.C. Kimlik No',
+      'Telefon No',
+      'Evrakı Alan',
+    ];
+
+    for (var i = 0; i < headers.length; i++) {
+      final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0));
+      cell.value = TextCellValue(headers[i]);
+      cell.cellStyle = CellStyle(bold: true);
+    }
+
+    // Örnek satır
+    final example = [
+      '24-06-2026',
+      'Ahmet Yılmaz',
+      'Nüfus Müdürlüğü',
+      'E-2026/045',
+      '12345678901',
+      '0532 123 4567',
+      '',
+    ];
+
+    for (var i = 0; i < example.length; i++) {
+      final cell = sheet.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 1));
+      cell.value = TextCellValue(example[i]);
+    }
+
+    // Kolon genişlikleri
+    for (var i = 0; i < headers.length; i++) {
+      sheet.setColumnWidth(i, 20);
+    }
+
+    // Kaydet — Downloads klasörüne
+    final dir = await getDownloadsDirectory();
+    if (dir == null) throw Exception('Downloads klasörü bulunamadı');
+    final filePath = p.join(dir.path, 'ice_aktarma_sablonu.xlsx');
+    final file = File(filePath);
+    file.writeAsBytesSync(excel.encode()!);
+    return filePath;
+  }
+
   /// Excel dosyasını okur ve ImportRow listesine dönüştürür.
   Future<List<ImportRow>> readRows(String path) async {
     final bytes = File(path).readAsBytesSync();

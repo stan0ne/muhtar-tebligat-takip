@@ -54,6 +54,7 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
       initialDate: initial,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      locale: const Locale('tr', 'TR'),
     );
     if (picked != null) {
       _gelisCtrl.text = DateFormat('dd-MM-yyyy').format(picked);

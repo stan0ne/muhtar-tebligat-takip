@@ -10,6 +10,16 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - Tarih aralığı raporlarında grafik görselleştirme
 - Bulut yedekleme OAuth 2.0 akışı (Google Drive / OneDrive)
 
+### Eklendi (Bugün)
+- **Otomatik arşivleme**: Ayarlar sayfasından açılıp kapatılabilir. Checkbox açıksa uygulama açılışında otomatik çalışır. Kriter: geliş tarihi bu yılın 1 Ocak'ından önce (Geçmiş Yıllar) VE geliş tarihi seçili aydan eski. Ayarlar: ay eşiği (1-12), Geçmiş Yıllar checkbox'ı, son çalışma zamanı, önizleme (tıklanabilir detay listesi), "Hemen Çalıştır" butonu.
+- **Tarih formatı**: Tüm tarih seçicilerde DD-MM-YYYY formatı (Flutter Türkçe locale desteği eklendi).
+- **Manuel arşivleme**: EvrakDetailPage'den herhangi bir evrak elle arşive aktarılabilir.
+- **İçe Aktarma şablonu**: İçe Aktarma sayfasına "Boş Şablon İndir" butonu eklendi. Downloads klasörüne kaydedilir, "Dosyayı Aç" ile doğrudan açılabilir.
+- **İçe Aktarma akışı**: Dosya seçimi → önizleme (sıra numaralı liste, kayıt sayısı) → "Veritabanına Aktar" butonu → sonuç dialog'u (başarılı/hata detayı). Aktarma sonrası ekran sıfırlanır.
+- **Teslim Edilenler sütunu**: Teslim Edilen Evraklar sayfasında Geliş Tarihi yerine Teslim Tarihi sütunu gösterilir.
+- **Pencere boyutu**: Uygulama 1170x900 px olarak açılıyor.
+- **Bağımlılık güncellemeleri**: flutter_localizations, intl, syncfusion_flutter_xlsio, file_picker, googleapis, googleapis_auth güncellendi.
+
 ---
 
 ## [1.3.0] — 2026-06-24

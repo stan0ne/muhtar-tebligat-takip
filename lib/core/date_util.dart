@@ -36,8 +36,14 @@ class DateUtil {
   }
 
   static DateTime _parse(String iso) {
-    if (iso.length <= 10) return DateFormat('yyyy-MM-dd').parse(iso);
-    return DateFormat('yyyy-MM-dd HH:mm:ss').parse(iso);
+    // ISO 8601: 2026-06-24T14:30:00.123456
+    final normalized = iso.replaceFirst('T', ' ');
+    if (normalized.length > 19) {
+      // Mikrosaniyeyi kaldır: 2026-06-24 14:30:00.123456 → 2026-06-24 14:30:00
+      return DateFormat('yyyy-MM-dd HH:mm:ss').parse(normalized.substring(0, 19));
+    }
+    if (normalized.length <= 10) return DateFormat('yyyy-MM-dd').parse(normalized);
+    return DateFormat('yyyy-MM-dd HH:mm:ss').parse(normalized);
   }
 
   /// İki ISO tarih aralığını karşılaştırmak için başlangıç bitişi döndürür.

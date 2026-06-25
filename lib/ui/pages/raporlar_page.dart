@@ -72,6 +72,7 @@ class _RaporlarPageState extends State<RaporlarPage> {
       initialDate: _bas,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      locale: const Locale('tr', 'TR'),
     );
     if (p != null) {
       setState(() {
@@ -87,6 +88,7 @@ class _RaporlarPageState extends State<RaporlarPage> {
       initialDate: _son,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      locale: const Locale('tr', 'TR'),
     );
     if (p != null) {
       setState(() {

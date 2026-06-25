@@ -14,6 +14,8 @@ class EvrakDataTable extends StatelessWidget {
   final ValueChanged<Evrak> onRowTap;
   final Set<int>? selectedIds;
   final ValueChanged<Set<int>>? onSelectionChanged;
+  final String dateColumnLabel;
+  final String Function(Evrak) dateGetter;
 
   const EvrakDataTable({
     super.key,
@@ -25,7 +27,11 @@ class EvrakDataTable extends StatelessWidget {
     required this.onRowTap,
     this.selectedIds,
     this.onSelectionChanged,
+    this.dateColumnLabel = 'Geliş Tarihi',
+    this.dateGetter = _defaultDateGetter,
   });
+
+  static String _defaultDateGetter(Evrak e) => e.gelisTarihi ?? '';
 
   int get _totalPages =>
       pageSize <= 0 ? 1 : ((total + pageSize - 1) ~/ pageSize);
@@ -36,8 +42,8 @@ class EvrakDataTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final columns = _isMultiSelect
-        ? const ['', 'Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', 'Geliş Tarihi', 'Durum']
-        : const ['Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', 'Geliş Tarihi', 'Durum'];
+        ? ['', 'Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', dateColumnLabel, 'Durum']
+        : ['Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', dateColumnLabel, 'Durum'];
 
     return Column(
       children: [
@@ -87,7 +93,7 @@ class EvrakDataTable extends StatelessWidget {
                               )),
                               DataCell(GestureDetector(
                                 onTap: () => onRowTap(e),
-                                child: Text(DateUtil.displayDate(e.gelisTarihi)),
+                                child: Text(DateUtil.displayDate(dateGetter(e))),
                               )),
                               DataCell(GestureDetector(
                                 onTap: () => onRowTap(e),

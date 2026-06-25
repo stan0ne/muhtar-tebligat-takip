@@ -19,6 +19,10 @@ class AppConstants {
   static const String prefThemeMode = 'theme_mode';
   static const String prefLastBackup = 'last_backup';
   static const String prefRememberUser = 'remember_user';
+  static const String prefAutoArchive = 'auto_archive';
+  static const String prefAutoArchiveMonths = 'auto_archive_months';
+  static const String prefAutoArchivePrevYears = 'auto_archive_prev_years';
+  static const String prefAutoArchiveLastRun = 'auto_archive_last_run';
 }
 
 /// Evrak durumları.

@@ -40,6 +40,29 @@ class _DashboardPageState extends State<DashboardPage> {
       _muhtarlikAdi = muhtarlikAdi;
       _loading = false;
     });
+
+    // Otomatik arşivleme — açılışta bir kez çalıştır
+    final autoArchive = await Services.settings.getBool(AppConstants.prefAutoArchive);
+    if (autoArchive && mounted) {
+      final monthsStr = await Services.settings.get(AppConstants.prefAutoArchiveMonths);
+      final prevYears = await Services.settings.getBool(AppConstants.prefAutoArchivePrevYears, def: true);
+      final months = int.tryParse(monthsStr ?? '') ?? 3;
+      final archived = await Services.evrak.autoArchive(monthsOld: months, prevYearsOnly: prevYears);
+      if (archived > 0 && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$archived evrak otomatik olarak arşive aktarıldı.')),
+        );
+        // Sayıları yenile
+        final newCounts = await Services.evrak.durumCounts();
+        final newTotal = await Services.evrak.totalCount();
+        if (mounted) setState(() {
+          _bekleyen = newCounts[EvrakDurum.bekliyor] ?? 0;
+          _teslim = newCounts[EvrakDurum.teslimEdildi] ?? 0;
+          _arsiv = newCounts[EvrakDurum.arsivlendi] ?? 0;
+          _toplam = newTotal;
+        });
+      }
+    }
   }
 
   @override

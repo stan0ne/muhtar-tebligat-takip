@@ -152,6 +152,12 @@ class _EvrakListePageState extends State<EvrakListePage> {
                             _selectedIds.addAll(ids);
                           })
                       : null,
+                  dateColumnLabel: widget.durum == EvrakDurum.teslimEdildi
+                      ? 'Teslim Tarihi'
+                      : 'Geliş Tarihi',
+                  dateGetter: widget.durum == EvrakDurum.teslimEdildi
+                      ? (e) => e.teslimTarihi ?? ''
+                      : (e) => e.gelisTarihi ?? '',
                 ),
         ),
       ],

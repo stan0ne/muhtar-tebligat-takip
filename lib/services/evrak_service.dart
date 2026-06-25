@@ -152,6 +152,51 @@ class EvrakService {
         aciklama: evrak?.adSoyad);
   }
 
+  // --- Otomatik Arşivleme ---
+
+  /// Otomatik arşivleme için uygun evrak sayısını döndürür (önizleme).
+  Future<int> autoArchivePreview({
+    int monthsOld = 3,
+    bool prevYearsOnly = true,
+  }) async {
+    final candidates = await _repo.findAutoArchiveCandidates(
+      monthsOld: monthsOld,
+      prevYearsOnly: prevYearsOnly,
+    );
+    return candidates.length;
+  }
+
+  /// Otomatik arşivleme önizleme detayı (evrak listesi).
+  Future<List<Map<String, dynamic>>> autoArchivePreviewDetails({
+    int monthsOld = 3,
+    bool prevYearsOnly = true,
+  }) async {
+    return _repo.findAutoArchivePreview(
+      monthsOld: monthsOld,
+      prevYearsOnly: prevYearsOnly,
+    );
+  }
+
+  /// Otomatik arşivleme: belirtilen kriterlere göre evrakları arşivler.
+  /// Arşivlenen evrak sayısını döndürür.
+  Future<int> autoArchive({
+    int monthsOld = 3,
+    bool prevYearsOnly = true,
+  }) async {
+    final candidates = await _repo.findAutoArchiveCandidates(
+      monthsOld: monthsOld,
+      prevYearsOnly: prevYearsOnly,
+    );
+    if (candidates.isEmpty) return 0;
+
+    int archivedCount = 0;
+    for (final evrak in candidates) {
+      await arsivle(evrak.id!);
+      archivedCount++;
+    }
+    return archivedCount;
+  }
+
   // --- Sorgu yöntemleri (UI katmanına proxy) ---
 
   Future<PagedResult<Evrak>> search({
