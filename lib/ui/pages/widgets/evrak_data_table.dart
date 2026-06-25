@@ -73,11 +73,26 @@ class EvrakDataTable extends StatelessWidget {
                                     onSelectionChanged!(newSet);
                                   },
                                 )),
-                              DataCell(Text(e.adSoyad)),
-                              DataCell(Text(e.geldigiKurum ?? '-')),
-                              DataCell(Text(e.evrakSayisi ?? '-')),
-                              DataCell(Text(DateUtil.displayDate(e.gelisTarihi))),
-                              DataCell(UiUtil.durumChip(context, e.durum)),
+                              DataCell(GestureDetector(
+                                onTap: () => onRowTap(e),
+                                child: Text(e.adSoyad),
+                              )),
+                              DataCell(GestureDetector(
+                                onTap: () => onRowTap(e),
+                                child: Text(e.geldigiKurum ?? '-'),
+                              )),
+                              DataCell(GestureDetector(
+                                onTap: () => onRowTap(e),
+                                child: Text(e.evrakSayisi ?? '-'),
+                              )),
+                              DataCell(GestureDetector(
+                                onTap: () => onRowTap(e),
+                                child: Text(DateUtil.displayDate(e.gelisTarihi)),
+                              )),
+                              DataCell(GestureDetector(
+                                onTap: () => onRowTap(e),
+                                child: UiUtil.durumChip(context, e.durum),
+                              )),
                             ],
                           ),
                       ],
