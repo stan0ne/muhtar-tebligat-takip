@@ -54,18 +54,10 @@ class EvrakDataTable extends StatelessWidget {
                       ],
                       rows: [
                         for (final e in items)
-                          DataRow(
-                            selected: _isMultiSelect && selectedIds!.contains(e.id),
+                          DataRow.byIndex(
+                            index: items.indexOf(e),
                             onSelectChanged: _isMultiSelect
-                                ? (val) {
-                                    final newSet = Set<int>.from(selectedIds!);
-                                    if (val == true) {
-                                      newSet.add(e.id!);
-                                    } else {
-                                      newSet.remove(e.id!);
-                                    }
-                                    onSelectionChanged!(newSet);
-                                  }
+                                ? null
                                 : (_) => onRowTap(e),
                             cells: [
                               if (_isMultiSelect)
