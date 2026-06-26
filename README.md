@@ -4,9 +4,10 @@
 
 <h1 align="center">Muhtarlık Tebligat Takip Sistemi</h1>
 
+<p align="center">
   Windows ortamında çalışan, modern, hızlı ve sade bir <strong>muhtarlık tebligat takip</strong> uygulaması.<br>
   Flutter Desktop + SQLite ile geliştirilmiştir. Sunucu gerektirmez, tek EXE olarak dağıtılabilir.
-Flutter Desktop + SQLite ile geliştirilmiştir. Sunucu gerektirmez, tek EXE olarak dağıtılabilir.
+</p>
 
 ## Özellikler
 
@@ -93,4 +94,3 @@ Detaylı şema ve indeksler: [ARCHITECTURE.md](./ARCHITECTURE.md#veritabanı-şe
 - [CHANGELOG.md](./CHANGELOG.md) — sürüm değişiklikleri
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — mimari ve teknik tasarım
 - [PROJECT_STATUS.md](./PROJECT_STATUS.md) — güncel durum, yapılacaklar
-- [Prompt.md](./Prompt.md) — orijinal gereksinimler
