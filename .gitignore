@@ -56,6 +56,13 @@ opencode.jsonc
 devtools_options.yaml
 .wix/
 
+# Windows auto-generated
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+windows/runner/runner.exe.manifest
+windows/runner/Runner.rc
+
 # Yanlışlıkla oluşmuş Windows ayrılmış ad
 nul
 
