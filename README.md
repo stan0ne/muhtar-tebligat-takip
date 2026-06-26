@@ -6,24 +6,30 @@ Flutter Desktop + SQLite ile geliştirilmiştir. Sunucu gerektirmez, tek EXE ola
 ## Özellikler
 
 - **Evrak kaydı**: geliş tarihi, ad soyad, geldiği kurum, evrak sayısı (otomatik "Bekliyor" durumu)
-- **Canlı arama**: ad soyad / evrak no / kurum / tarih aralığı / durum filtreleri (debounce'lu)
+- **Canlı arama**: ad soyad / evrak no / kurum / teslim alan / telefon / TC kimlik no filtreleri (debounce'lu)
 - **Durum yönetimi**: Bekliyor → Teslim Edildi / Arşivlendi, arşivden geri alma
+- **Toplu teslim**: çoklu seçim ile birden fazla evrakı tek seferde teslim etme
 - **Teslim işlemi**: teslim alan, T.C. kimlik, telefon, açıklama → otomatik teslim kaydı + tarih
-- **Arşivleme**: manuel arşivle / geri al, kayıtlar silinmez
+- **Durum geçmişi**: her evrakın durum değişiklik geçmişi (zaman çizelgesi)
+- **Arşivleme**: manuel arşiv / geri al, otomatik arşivleme (ayarlanabilir ay eşiği)
 - **Raporlar**: günlük/aylık/yıllık/tarih aralığı + **Excel** ve **PDF** çıktıları
-- **Yedekleme**: manuel + otomatik günlük yedek, geri yükleme, yedek listesi
-- **Excel içe aktarma**: sihirbaz (başlık eşleme, önizleme, "Evrakı Alan" → Teslim Edildi)
-- **Kullanıcı yönetimi**: Yönetici / Personel rolleri, parola değiştirme, aktif/pasif
-- **Log sistemi**: tüm işlemler (ekleme, güncelleme, teslim, arşivleme, silme, giriş/çıkış, yedekleme, içe aktarma)
+- **Yedekleme**: dahili + harici (dizin seçimi) + bulut yedekleme (Google Drive / OneDrive skeleton)
+- **Excel içe aktarma**: boş şablon indirme, dosya seçimi → önizleme → veritabanına aktarma
+- **Log sistemi**: tüm işlemler (ekleme, güncelleme, teslim, arşivleme, silme, yedekleme, içe aktarma)
 - **Yumuşak silme**: kayıtlar fiziksel silinmez (`silindi_mi`, `silinme_tarihi`)
 - **Tema**: açık / koyu / sistem
-- **Performans**: indeksler (ad_soyad, evrak_sayisi, durum, tarih) + sayfalama (50/sayfa) → 500.000+ kayıt hedefi
-- **Türkçe arayüz**, UTF-8 desteği
+- **Performans**: indeksler + sayfalama (50/sayfa) → 500.000+ kayıt hedefi
+- **Türkçe arayüz**, UTF-8 desteği, Türkçe karakter duyarlı arama (REPLACE zincirleri)
+- **Responsive dashboard**: kartlar ekran boyutuna göre orantılı ölçeklenir
+- **ESC desteği**: tüm uygulamada ESC tuşu ile geri dönme
+- **Pencere boyutu**: 1170×900 px
+- **Tarih formatı**: DD-MM-YYYY (görüntüleme), YYYY-MM-DD (veritabanı)
+- **Kurulum**: EXE (Inno Setup) ve MSI (WiX v4) installer desteği
 
 ## Kurulum & Çalıştırma
 
 ### Gereksinimler
-- Flutter 3.41+ (stable)
+- Flutter 3.44+ (stable)
 - Windows 10/11
 - **Geliştirici Modu** açık olmalı (plugin symlink için): `ms-settings:developers`
 
@@ -41,10 +47,13 @@ flutter build windows --release
 
 Dağıtım için `Release` klasörünün tamamı (EXE + DLL + data) kopyalanır.
 
-### İlk Giriş
-- Kullanıcı: `admin`
-- Şifre: `admin`
-- Giriş sonrası **Ayarlar** → parola değiştirme önerilir.
+### Installer oluşturma
+```bash
+create_installer.bat
+```
+Bu komut hem EXE (Inno Setup) hem MSI (WiX v4) installer üretir:
+- `installer\muhtar_tebligat_takip_setup_1.3.0.exe` (Inno Setup)
+- `installer\muhtar_tebligat_takip_msi_1.3.0.msi` (WiX v4)
 
 ## Mimari
 
@@ -55,11 +64,10 @@ lib/
 ├── core/              # Sabitler, tarih yardımcıları
 ├── data/
 │   ├── database/      # SQLite yöneticisi, şema, migrasyon, indeksler
-│   ├── models/        # Evrak, TeslimKaydi, User, LogEntry
-│   └── repositories/  # Repository Pattern (Evrak/Teslim/User/Log)
-├── services/          # İş katmanı: Auth, Evrak, Backup, Export, Import, Log, Settings
+│   ├── models/        # Evrak, TeslimKaydi, DurumGecmisi, LogEntry
+│   └── repositories/  # Repository Pattern (Evrak/Teslim/DurumGecmisi/Log)
+├── services/          # İş katmanı: Evrak, Backup, CloudBackup, Export, Import, Log, Settings
 └── ui/
-    ├── auth/          # Giriş ekranı
     ├── pages/         # Tüm ekranlar + widget'lar
     ├── providers/     # Provider ile durum yönetimi
     ├── shell/         # Ana menü iskeleti
@@ -71,13 +79,13 @@ lib/
 
 SQLite (tek `tebligat.db` dosyası, `ApplicationSupportDirectory` altında).
 
-**Tablolar:** `Evraklar`, `TeslimKayitlari`, `Kullanicilar`, `Loglar`, `Ayarlar`
+**Tablolar:** `Evraklar`, `TeslimKayitlari`, `DurumGecmisleri`, `Loglar`, `Ayarlar`
 
 Detaylı şema ve indeksler: [ARCHITECTURE.md](./ARCHITECTURE.md#veritabanı-şeması)
 
 ## Dokümanlar
 
-- [PROJECT_STATUS.md](./PROJECT_STATUS.md) — güncel durum, yapılacaklar, kontrol listesi
 - [CHANGELOG.md](./CHANGELOG.md) — sürüm değişiklikleri
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — mimari ve teknik tasarım
+- [PROJECT_STATUS.md](./PROJECT_STATUS.md) — güncel durum, yapılacaklar
 - [Prompt.md](./Prompt.md) — orijinal gereksinimler
