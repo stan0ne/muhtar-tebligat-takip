@@ -54,6 +54,7 @@ opencode.jsonc
 # Flutter auto-generated
 .metadata
 devtools_options.yaml
+.wix/
 
 # Yanlışlıkla oluşmuş Windows ayrılmış ad
 nul

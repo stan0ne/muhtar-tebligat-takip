@@ -24,7 +24,7 @@ Flutter Desktop + SQLite ile geliştirilmiştir. Sunucu gerektirmez, tek EXE ola
 - **ESC desteği**: tüm uygulamada ESC tuşu ile geri dönme
 - **Pencere boyutu**: 1170×900 px
 - **Tarih formatı**: DD-MM-YYYY (görüntüleme), YYYY-MM-DD (veritabanı)
-- **Kurulum**: EXE (Inno Setup) ve MSI (WiX v4) installer desteği
+- **Kurulum**: MSIX (modern Windows paketleme, Microsoft Store desteği)
 
 ## Kurulum & Çalıştırma
 
@@ -47,13 +47,13 @@ flutter build windows --release
 
 Dağıtım için `Release` klasörünün tamamı (EXE + DLL + data) kopyalanır.
 
-### Installer oluşturma
+### MSIX paketi oluşturma
 ```bash
-create_installer.bat
+dart run msix:create
 ```
-Bu komut hem EXE (Inno Setup) hem MSI (WiX v4) installer üretir:
-- `installer\muhtar_tebligat_takip_setup_1.3.0.exe` (Inno Setup)
-- `installer\muhtar_tebligat_takip_msi_1.3.0.msi` (WiX v4)
+Çıktı: `build\windows\x64\runner\Release\muhtar_tebligat_takip.msix`
+
+MSIX, Windows'un modern paketleme formatıdır. Kurulum temizdir, Program Ekle/Kaldır'da görünür, otomatik güncelleme destekler.
 
 ## Mimari
 
