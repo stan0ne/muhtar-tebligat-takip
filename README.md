@@ -93,4 +93,3 @@ Detaylı şema ve indeksler: [ARCHITECTURE.md](./ARCHITECTURE.md#veritabanı-şe
 
 - [CHANGELOG.md](./CHANGELOG.md) — sürüm değişiklikleri
 - [ARCHITECTURE.md](./ARCHITECTURE.md) — mimari ve teknik tasarım
-- [PROJECT_STATUS.md](./PROJECT_STATUS.md) — güncel durum, yapılacaklar
