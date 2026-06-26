@@ -47,11 +47,19 @@ app.*.map.json
 # CodeGraph / IDE / agent araçları
 .codegraph/
 .claude/
+.gemini/
 .mcp.json
 opencode.jsonc
+
+# Flutter auto-generated
+.metadata
+devtools_options.yaml
 
 # Yanlışlıkla oluşmuş Windows ayrılmış ad
 nul
 
 # Installer
 installer/
+
+# Icon kaynak dosyalari (build'de kullanilmiyor)
+muhtar-tebligat-icon/

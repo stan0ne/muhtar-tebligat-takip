@@ -4,7 +4,7 @@ echo  Muhtar Tebligat Takip - Installer Olusturma
 echo ========================================
 echo.
 
-echo [1/3] Flutter build aliniyor...
+echo [1/4] Flutter build aliniyor...
 call flutter build windows
 if %errorlevel% neq 0 (
     echo HATA: Flutter build basarisiz!
@@ -14,7 +14,7 @@ if %errorlevel% neq 0 (
 echo Build basarili!
 echo.
 
-echo [2/3] Inno Setup derleniyor...
+echo [2/4] Inno Setup derleniyor...
 where iscc >nul 2>nul
 if %errorlevel% equ 0 (
     iscc /Q installer.iss
@@ -38,12 +38,28 @@ if %errorlevel% equ 0 (
 )
 echo.
 
-echo [3/3] Tamamlandi!
+echo [3/4] WiX MSI derleniyor...
+where wix >nul 2>nul
+if %errorlevel% equ 0 (
+    wix build -o "installer\muhtar_tebligat_takip_msi_1.3.0.msi" -b "%~dp0" installer.wxs
+    if %errorlevel% neq 0 (
+        echo UYARI: WiX MSI derlemesi basarisiz!
+    ) else (
+        echo MSI installer basariyla olusturuldu!
+        del /q "installer\*.wixpdb" 2>nul
+    )
+) else (
+    echo UYARI: WiX bulunamadi! MSI olusturulamadi.
+)
+echo.
+
+echo [4/4] Tamamlandi!
 echo.
 if exist "installer\muhtar_tebligat_takip_setup_1.3.0.exe" (
-    echo Installer konumu: installer\muhtar_tebligat_takip_setup_1.3.0.exe
-) else (
-    echo Installer klasoru: installer\
+    echo EXE Installer: installer\muhtar_tebligat_takip_setup_1.3.0.exe
+)
+if exist "installer\muhtar_tebligat_takip_msi_1.3.0.msi" (
+    echo MSI Installer: installer\muhtar_tebligat_takip_msi_1.3.0.msi
 )
 echo.
 pause

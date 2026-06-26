@@ -20,8 +20,9 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - **Pencere boyutu**: Uygulama 1170x900 px olarak açılıyor.
 - **ESC desteği**: Tüm uygulamada ESC tuşu ile bir önceki sayfaya geri dönme desteği.
 - **Responsive Dashboard**: Dashboard kartları ekran boyutuna göre orantılı ölçeklenir.
-- **Windows Installer**: Inno Setup ile kurulum dosyası oluşturulabilir. `create_installer.bat` çalıştırılarak otomatik build + installer üretimi.
+- **Windows Installer**: Inno Setup ile EXE kurulum dosyası (`muhtar_tebligat_takip_setup_1.3.0.exe`) ve WiX v4 ile MSI kurulum dosyası (`muhtar_tebligat_takip_msi_1.3.0.msi`) oluşturulabilir. `create_installer.bat` çalıştırılarak otomatik build + her iki installer üretimi.
 - **Bağımlılık güncellemeleri**: flutter_localizations, intl, syncfusion_flutter_xlsio, file_picker, googleapis, googleapis_auth güncellendi.
+- **.gitignore temizliği**: `.gemini/`, `.metadata`, `devtools_options.yaml`, `muhtar-tebligat-icon/` artık ignore ediliyor.
 
 ---
 
