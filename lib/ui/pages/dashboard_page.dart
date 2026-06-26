@@ -70,14 +70,17 @@ class _DashboardPageState extends State<DashboardPage> {
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
     }
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scale = (screenWidth / 1170).clamp(0.8, 1.5);
+
     return Column(
       children: [
         Expanded(
           child: GridView.count(
-            padding: const EdgeInsets.all(24),
-            crossAxisCount: MediaQuery.of(context).size.width > 900 ? 4 : 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
+            padding: EdgeInsets.all(24 * scale),
+            crossAxisCount: screenWidth > 900 ? 4 : 2,
+            mainAxisSpacing: 16 * scale,
+            crossAxisSpacing: 16 * scale,
             childAspectRatio: 1.6,
             children: [
               _card(

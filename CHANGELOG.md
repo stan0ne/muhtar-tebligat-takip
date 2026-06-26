@@ -18,6 +18,8 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - **İçe Aktarma akışı**: Dosya seçimi → önizleme (sıra numaralı liste, kayıt sayısı) → "Veritabanına Aktar" butonu → sonuç dialog'u (başarılı/hata detayı). Aktarma sonrası ekran sıfırlanır.
 - **Teslim Edilenler sütunu**: Teslim Edilen Evraklar sayfasında Geliş Tarihi yerine Teslim Tarihi sütunu gösterilir.
 - **Pencere boyutu**: Uygulama 1170x900 px olarak açılıyor.
+- **ESC desteği**: Tüm uygulamada ESC tuşu ile bir önceki sayfaya geri dönme desteği.
+- **Responsive Dashboard**: Dashboard kartları ekran boyutuna göre orantılı ölçeklenir.
 - **Bağımlılık güncellemeleri**: flutter_localizations, intl, syncfusion_flutter_xlsio, file_picker, googleapis, googleapis_auth güncellendi.
 
 ---

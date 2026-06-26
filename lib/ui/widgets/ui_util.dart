@@ -53,28 +53,43 @@ class UiUtil {
     required Color color,
   }) {
     final theme = Theme.of(ctx);
+    final screenWidth = MediaQuery.of(ctx).size.width;
+    final scale = (screenWidth / 1170).clamp(0.8, 1.5);
+
+    final iconSize = 26 * scale;
+    final avatarRadius = 26 * scale;
+    final padding = 20 * scale;
+    final spacing = 16 * scale;
+    final titleSize = 12 * scale;
+    final valueSize = 28 * scale;
+
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(padding),
         child: Row(
           children: [
             CircleAvatar(
               backgroundColor: color.withOpacity(0.15),
-              radius: 26,
-              child: Icon(icon, color: color, size: 26),
+              radius: avatarRadius,
+              child: Icon(icon, color: color, size: iconSize),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: spacing),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(title,
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(color: theme.hintColor)),
-                  const SizedBox(height: 4),
+                      style: TextStyle(
+                        color: theme.hintColor,
+                        fontSize: titleSize,
+                      )),
+                  const SizedBox(height: 6),
                   Text('$value',
-                      style: theme.textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                        fontSize: valueSize,
+                        fontWeight: FontWeight.bold,
+                      )),
                 ],
               ),
             ),
