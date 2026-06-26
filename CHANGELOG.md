@@ -6,7 +6,6 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 ## [Unreleased]
 
 ### Beklenen
-- Türkçe karakter duyarsız arama (FTS5 / ICU collation)
 - Tarih aralığı raporlarında grafik görselleştirme
 - Bulut yedekleme OAuth 2.0 akışı (Google Drive / OneDrive)
 
