@@ -1,0 +1,57 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Build Windows
+        run: flutter build windows --release
+
+      - name: Create MSIX
+        run: dart run msix:create
+
+      - name: Build EXE (Inno Setup)
+        uses: minhhung123/setup-inno-setup@v2
+        with:
+          version: '6'
+
+      - name: Compile EXE
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q installer.iss
+
+      - name: Upload MSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: msix
+          path: build\windows\x64\runner\Release\*.msix
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: exe
+          path: installer\*.exe
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build\windows\x64\runner\Release\*.msix
+            installer\*.exe
+          draft: false
+          prerelease: false
