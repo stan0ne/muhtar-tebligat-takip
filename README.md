@@ -1,6 +1,13 @@
-# Muhtarlık Tebligat Takip Sistemi
+<p align="center">
+  <img src="docs/logo.png" alt="Muhtarlık Tebligat Takip Sistemi" width="200">
+</p>
 
-Windows ortamında çalışan, modern, hızlı ve sade bir **muhtarlık tebligat takip** uygulaması.
+<h1 align="center">Muhtarlık Tebligat Takip Sistemi</h1>
+
+<p align="center">
+  Windows ortamında çalışan, modern, hızlı ve sade bir <strong>muhtarlık tebligat takip</strong> uygulaması.<br>
+  Flutter Desktop + SQLite ile geliştirilmiştir. Sunucu gerektirmez, tek EXE olarak dağıtılabilir.
+</p>
 Flutter Desktop + SQLite ile geliştirilmiştir. Sunucu gerektirmez, tek EXE olarak dağıtılabilir.
 
 ## Özellikler
