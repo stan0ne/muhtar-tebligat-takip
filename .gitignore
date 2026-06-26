@@ -52,3 +52,6 @@ opencode.jsonc
 
 # Yanlışlıkla oluşmuş Windows ayrılmış ad
 nul
+
+# Installer
+installer/

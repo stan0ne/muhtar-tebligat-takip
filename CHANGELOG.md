@@ -20,6 +20,7 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - **Pencere boyutu**: Uygulama 1170x900 px olarak açılıyor.
 - **ESC desteği**: Tüm uygulamada ESC tuşu ile bir önceki sayfaya geri dönme desteği.
 - **Responsive Dashboard**: Dashboard kartları ekran boyutuna göre orantılı ölçeklenir.
+- **Windows Installer**: Inno Setup ile kurulum dosyası oluşturulabilir. `create_installer.bat` çalıştırılarak otomatik build + installer üretimi.
 - **Bağımlılık güncellemeleri**: flutter_localizations, intl, syncfusion_flutter_xlsio, file_picker, googleapis, googleapis_auth güncellendi.
 
 ---
