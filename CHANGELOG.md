@@ -3,13 +3,6 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
-## [Unreleased]
-
-### Beklenen
-- Tarih aralığı raporlarında grafik görselleştirme
-
----
-
 ## [1.3.0] — 2026-06-26
 
 ### Eklendi
