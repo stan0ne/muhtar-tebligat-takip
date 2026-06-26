@@ -25,13 +25,16 @@ if %errorlevel% equ 0 (
     )
     echo Installer basariyla olusturuldu!
 ) else (
-    echo UYARI: Inno Setup bulunamadi!
-    echo Inno Setup'i buradan indirin: https://jrsoftware.org/isdl.php
-    echo Indirdikten sonra iscc.exe'nin oldugu klasoru PATH'e ekleyin
-    echo veya asagidaki komutu calistirin:
-    echo.
-    echo   "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
-    echo.
+    if exist "C:\Users\savas.boluk\AppData\Local\Programs\Inno Setup 6\ISCC.exe" (
+        "C:\Users\savas.boluk\AppData\Local\Programs\Inno Setup 6\ISCC.exe" /Q installer.iss
+    ) else (
+        echo UYARI: Inno Setup bulunamadi!
+        echo Inno Setup'i buradan indirin: https://jrsoftware.org/isdl.php
+        echo Indirdikten sonra asagidaki komutu calistirin:
+        echo.
+        echo   "C:\Users\savas.boluk\AppData\Local\Programs\Inno Setup 6\ISCC.exe" installer.iss
+        echo.
+    )
 )
 echo.
 
