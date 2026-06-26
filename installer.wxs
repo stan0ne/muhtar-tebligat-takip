@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <Package Name="Muhtar Tebligat Takip"
-           Manufacturer="Muhtarlık Tebligat Takip Sistemi"
+           Manufacturer="Muhtarlik Tebligat Takip Sistemi"
            Version="1.3.0"
            UpgradeCode="B8E7C9A2-4F3D-4E5A-9C1B-2D6F8A3E7C9D"
-           Scope="perUser">
+           Scope="perMachine"
+           Codepage="1254">
 
     <SummaryInformation Description="Muhtarlık Tebligat Takip Sistemi" />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
     <MajorUpgrade DowngradeErrorMessage="Daha yüksek bir sürüm zaten yüklü." />
 
-    <StandardDirectory Id="LocalAppDataFolder">
+    <StandardDirectory Id="ProgramFilesFolder">
       <Directory Id="InstallFolder" Name="MuhtarTebligatTakip">
         <Component Id="MainExe" Guid="A1B2C3D4-E5F6-7890-ABCD-EF1234567890">
           <File Id="ExeFile" Source="build\windows\x64\runner\Release\muhtar_tebligat_takip.exe" KeyPath="yes" />
@@ -47,7 +49,7 @@
                     Name="Muhtar Tebligat Takip"
                     Target="[InstallFolder]muhtar_tebligat_takip.exe"
                     Description="Muhtarlık Tebligat Takip Sistemi" />
-          <RegistryValue Root="HKCU" Key="Software\MuhtarTebligatTakip" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+          <RegistryValue Root="HKLM" Key="Software\MuhtarTebligatTakip" Name="installed" Type="integer" Value="1" KeyPath="yes" />
         </Component>
       </Directory>
     </StandardDirectory>
@@ -58,17 +60,23 @@
                   Name="Muhtar Tebligat Takip"
                   Target="[InstallFolder]muhtar_tebligat_takip.exe"
                   Description="Muhtarlık Tebligat Takip Sistemi" />
-        <RegistryValue Root="HKCU" Key="Software\MuhtarTebligatTakip" Name="desktop" Type="integer" Value="1" KeyPath="yes" />
+        <RegistryValue Root="HKLM" Key="Software\MuhtarTebligatTakip" Name="desktop" Type="integer" Value="1" KeyPath="yes" />
       </Component>
     </StandardDirectory>
 
-    <Feature Id="Main">
+    <Feature Id="Main" Title="Muhtar Tebligat Takip" Level="1">
       <ComponentRef Id="MainExe" />
       <ComponentRef Id="DllFiles" />
       <ComponentRef Id="DataFiles" />
       <ComponentRef Id="FlutterAssets" />
       <ComponentRef Id="StartMenuShortcut" />
+    </Feature>
+
+    <Feature Id="DesktopShortcutFeature" Title="Masaüstü Kısayolu" Description="Masaüstüne kısayol oluşturur." Level="1" AllowAbsent="yes">
       <ComponentRef Id="DesktopShortcut" />
     </Feature>
+
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="InstallFolder" />
+
   </Package>
 </Wix>
