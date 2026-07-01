@@ -239,7 +239,7 @@ class _IceAktarmaPageState extends State<IceAktarmaPage> {
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 8),
-                  OutlinedButton.icon(
+                  FilledButton.icon(
                     onPressed: _creatingTemplate ? null : _createTemplate,
                     icon: _creatingTemplate
                         ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
@@ -263,7 +263,7 @@ class _IceAktarmaPageState extends State<IceAktarmaPage> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      OutlinedButton.icon(
+                      FilledButton.icon(
                         onPressed: _loading ? null : _pick,
                         icon: const Icon(Icons.attach_file),
                         label: const Text('Excel Dosyası Seç'),

@@ -570,7 +570,7 @@ class _AyarlarPageState extends State<AyarlarPage> {
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton.icon(
+                        child: FilledButton.icon(
                           onPressed: () => _showImportDialog(),
                           icon: const Icon(Icons.file_upload),
                           label: const Text('İçe Aktarma'),
@@ -578,7 +578,7 @@ class _AyarlarPageState extends State<AyarlarPage> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: OutlinedButton.icon(
+                        child: FilledButton.icon(
                           onPressed: () => _exportDatabase(),
                           icon: const Icon(Icons.file_download),
                           label: const Text('Dışa Aktar'),
@@ -651,7 +651,7 @@ class _AyarlarPageState extends State<AyarlarPage> {
                       const SizedBox(width: 8),
                       const Text('günden eski logları temizle'),
                       const Spacer(),
-                      FilledButton.tonalIcon(
+                      FilledButton.icon(
                         onPressed: _cleaning ? null : _cleanOldLogs,
                         icon: _cleaning
                             ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
@@ -663,10 +663,11 @@ class _AyarlarPageState extends State<AyarlarPage> {
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: OutlinedButton.icon(
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(backgroundColor: Colors.red),
                       onPressed: _cleaning ? null : _cleanAllLogs,
-                      icon: const Icon(Icons.delete_forever, color: Colors.red),
-                      label: const Text('Tüm Logları Sil', style: TextStyle(color: Colors.red)),
+                      icon: const Icon(Icons.delete_forever),
+                      label: const Text('Tüm Logları Sil'),
                     ),
                   ),
                 ],

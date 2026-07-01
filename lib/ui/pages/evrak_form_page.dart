@@ -225,7 +225,7 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
                             ),
                             if (isEdit) ...[
                               const SizedBox(width: 12),
-                              OutlinedButton(
+                              FilledButton.tonal(
                                 onPressed: () => Navigator.of(context).pop(false),
                                 child: const Text('İptal'),
                               ),

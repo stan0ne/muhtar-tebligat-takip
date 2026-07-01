@@ -239,13 +239,13 @@ class _RaporlarPageState extends State<RaporlarPage> {
           if (!_loading && _counts.isNotEmpty)
             Row(
               children: [
-                FilledButton.tonalIcon(
+                FilledButton.icon(
                   onPressed: _exporting ? null : _exportExcel,
                   icon: const Icon(Icons.table_view),
                   label: const Text('Excel\'e Aktar'),
                 ),
                 const SizedBox(width: 12),
-                FilledButton.tonalIcon(
+                FilledButton.icon(
                   onPressed: _exporting ? null : _exportPdf,
                   icon: const Icon(Icons.picture_as_pdf),
                   label: const Text('PDF\'e Aktar'),

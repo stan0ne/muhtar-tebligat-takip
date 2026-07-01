@@ -266,25 +266,25 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
                           icon: const Icon(Icons.local_shipping),
                           label: const Text('Teslim Et'),
                         ),
-                      OutlinedButton.icon(
+                      FilledButton.icon(
                         onPressed: _duzenle,
                         icon: const Icon(Icons.edit),
                         label: const Text('Düzenle'),
                       ),
                       if (isBekleyen)
-                        OutlinedButton.icon(
+                        FilledButton.icon(
                           onPressed: _arsivle,
                           icon: const Icon(Icons.archive),
                           label: const Text('Arşivle'),
                         ),
                       if (isArsiv)
-                        OutlinedButton.icon(
+                        FilledButton.icon(
                           onPressed: _geriAl,
                           icon: const Icon(Icons.restore),
                           label: const Text('Bekleyene Geri Al'),
                         ),
-                      OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                      FilledButton.icon(
+                        style: FilledButton.styleFrom(backgroundColor: Colors.red),
                         onPressed: _sil,
                         icon: const Icon(Icons.delete),
                         label: const Text('Sil'),

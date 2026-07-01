@@ -193,7 +193,7 @@ class _YedeklemePageState extends State<YedeklemePage> {
                         label: const Text('Şimdi Yedek Al'),
                       ),
                       const SizedBox(width: 12),
-                      OutlinedButton.icon(
+                      FilledButton.icon(
                         onPressed: () async {
                           final res = await FilePicker.platform.pickFiles(
                             type: FileType.custom,
@@ -256,7 +256,7 @@ class _YedeklemePageState extends State<YedeklemePage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      FilledButton.tonalIcon(
+                      FilledButton.icon(
                         onPressed: _savingExternal ? null : _backupToExternal,
                         icon: _savingExternal
                             ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
@@ -339,9 +339,10 @@ class _YedeklemePageState extends State<YedeklemePage> {
                             leading: const Icon(Icons.cloud_upload, color: Colors.blue),
                             title: const Text('Google Drive'),
                             subtitle: const Text('Google hesabınıza yedekleyin'),
-                            trailing: FilledButton.tonal(
+                            trailing: FilledButton.icon(
                               onPressed: () => _connectCloud('google'),
-                              child: const Text('Bağlan'),
+                              icon: const Icon(Icons.cloud_upload, size: 16),
+                              label: const Text('Bağlan'),
                             ),
                           ),
                         ),
@@ -354,9 +355,10 @@ class _YedeklemePageState extends State<YedeklemePage> {
                             leading: const Icon(Icons.cloud_upload, color: Colors.blueAccent),
                             title: const Text('OneDrive'),
                             subtitle: const Text('Microsoft hesabınıza yedekleyin'),
-                            trailing: FilledButton.tonal(
+                            trailing: FilledButton.icon(
                               onPressed: () => _connectCloud('onedrive'),
-                              child: const Text('Bağlan'),
+                              icon: const Icon(Icons.cloud_upload, size: 16),
+                              label: const Text('Bağlan'),
                             ),
                           ),
                         ),
