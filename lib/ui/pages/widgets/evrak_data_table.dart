@@ -42,9 +42,7 @@ class EvrakDataTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isLight = theme.brightness == Brightness.light;
-    final columns = _isMultiSelect
-        ? ['', 'Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', dateColumnLabel, 'Durum']
-        : ['Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', dateColumnLabel, 'Durum'];
+    final columns = ['Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', dateColumnLabel, 'Durum'];
 
     // Açık tema için sütun başlık stili
     final headerStyle = TextStyle(
@@ -147,7 +145,7 @@ class EvrakDataTable extends StatelessWidget {
                               DataCell(Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: SizedBox(
-                                  width: 50,
+                                  width: 60,
                                   child: GestureDetector(
                                     onTap: () => onRowTap(e),
                                     child: Text(e.evrakSayisi ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
@@ -157,7 +155,7 @@ class EvrakDataTable extends StatelessWidget {
                               DataCell(Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: SizedBox(
-                                  width: 55,
+                                  width: 66,
                                   child: GestureDetector(
                                     onTap: () => onRowTap(e),
                                     child: Text(DateUtil.displayDate(dateGetter(e)), style: cellStyle),
@@ -166,12 +164,9 @@ class EvrakDataTable extends StatelessWidget {
                               )),
                               DataCell(Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: SizedBox(
-                                  width: 110,
-                                  child: GestureDetector(
-                                    onTap: () => onRowTap(e),
-                                    child: UiUtil.durumChip(context, e.durum),
-                                  ),
+                                child: GestureDetector(
+                                  onTap: () => onRowTap(e),
+                                  child: UiUtil.durumChip(context, e.durum),
                                 ),
                               )),
                             ],
