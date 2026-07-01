@@ -18,6 +18,8 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - **Windows Installer (EXE)**: Inno Setup 6 ile .exe kurucu. Admin yetkisi ile Program Files'a kurulum.
 - **MSIX paketi**: `dart run msix:create` ile modern Windows paketleme.
 - **Veritabanı bilgisi**: Ayarlar sayfasında dosya adı, konum, boyut ve şema sürümü gösterilir.
+- **Veritabanı Dışa Aktar**: Ayarlar > Veritabanı bölümünden harici konuma veritabanı kopyalanabilir.
+- **Hızlı arama sıralaması**: Bekliyor durumundaki evraklar üstte (geliş tarihi en yeni), Teslim Edilenler altta (teslim tarihi en yeni).
 - **Bağımlılık güncellemeleri**: flutter_localizations, intl, syncfusion_flutter_xlsio, file_picker, googleapis, googleapis_auth.
 - **GitHub Actions CI/CD**: `v*` tag push'unda otomatik build + release.
 
@@ -25,6 +27,7 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - Login ekranı kaldırıldı — uygulama doğrudan açılır.
 - Kullanıcı bilgi alanı / çıkış butonu kaldırıldı.
 - Auth servisleri (AuthService, UserRepository, CryptoUtil) kaldırıldı — artık kullanılmıyor.
+- İçe Aktarma menüden kaldırıldı, Ayarlar > Veritabanı altına taşındı.
 - Veritabanı v1 → v2 (DurumGecmisleri tablosu eklendi).
 - Yedekleme sayfası yeniden yapılandırıldı (Dahili, Harici, Bulut bölümleri).
 
