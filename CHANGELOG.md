@@ -39,6 +39,9 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - Auth ile ilgili dosyalar silindi (user.dart, user_repository.dart, auth_service.dart, crypto_util.dart, login_screen.dart, user_dialog.dart).
 - Otomatik üretilen dosyalar (.gitignore'a eklendi).
 
+### Düzeltildi
+- EvrakDüzenleme formunda arka plan rengi kayboluyordu — Scaffold eklendi.
+
 ---
 
 ## [1.2.0] — 2026-06-24
