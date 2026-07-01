@@ -1,16 +1,17 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 import '../../core/constants.dart';
 import '../../core/date_util.dart';
-import '../../data/models/user.dart';
+import '../../data/database/database_helper.dart';
 import '../../services/evrak_service.dart';
 import '../../services/log_service.dart';
 import '../providers/app_provider.dart';
 import '../pages/evrak_detail_page.dart';
-import 'widgets/user_dialog.dart';
 import 'widgets/log_viewer_dialog.dart';
 
-/// Ayarlar: tema, parola değiştirme, kullanıcı yönetimi, loglar.
+/// Ayarlar: tema, muhtarlık bilgileri, loglar, veritabanı bilgisi.
 class AyarlarPage extends StatefulWidget {
   const AyarlarPage({super.key});
 
@@ -19,7 +20,6 @@ class AyarlarPage extends StatefulWidget {
 }
 
 class _AyarlarPageState extends State<AyarlarPage> {
-  List<User> _users = [];
   final _muhtarlikAdiCtrl = TextEditingController();
   final _muhtarAdSoyadCtrl = TextEditingController();
   final _ilCtrl = TextEditingController();
@@ -42,13 +42,17 @@ class _AyarlarPageState extends State<AyarlarPage> {
   bool _previewLoading = false;
   List<Map<String, dynamic>> _previewDetails = [];
 
+  // Veritabanı bilgisi
+  String _dbPath = '';
+  int _dbSize = 0;
+
   @override
   void initState() {
     super.initState();
-    _loadUsers();
     _loadMuhtarlik();
     _loadLogStats();
     _loadAutoArchiveSettings();
+    _loadDbInfo();
   }
 
   @override
@@ -59,11 +63,6 @@ class _AyarlarPageState extends State<AyarlarPage> {
     _ilceCtrl.dispose();
     _gunCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadUsers() async {
-    final users = await Services.auth.listUsers();
-    if (mounted) setState(() => _users = users);
   }
 
   Future<void> _loadMuhtarlik() async {
@@ -340,11 +339,35 @@ class _AyarlarPageState extends State<AyarlarPage> {
     );
   }
 
+  // --- Veritabanı Bilgisi ---
+
+  Future<void> _loadDbInfo() async {
+    try {
+      final path = await DatabaseHelper.instance.dbPath;
+      final file = File(path);
+      int size = 0;
+      if (await file.exists()) {
+        size = await file.length();
+      }
+      if (mounted) {
+        setState(() {
+          _dbPath = path;
+          _dbSize = size;
+        });
+      }
+    } catch (_) {}
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
     final theme = Theme.of(context);
-    final isYonetici = app.user?.isYonetici ?? false;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -456,49 +479,29 @@ class _AyarlarPageState extends State<AyarlarPage> {
             ),
           ),
           const SizedBox(height: 16),
-          // --- Kullanıcı Yönetimi ---
-          if (isYonetici)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text('Kullanıcı Yönetimi', style: theme.textTheme.titleMedium),
-                        const Spacer(),
-                        FilledButton.icon(
-                          onPressed: () => _showUserDialog(null),
-                          icon: const Icon(Icons.person_add),
-                          label: const Text('Yeni Kullanıcı'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _users.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
-                      itemBuilder: (_, i) {
-                        final u = _users[i];
-                        return ListTile(
-                          leading: Icon(u.aktif ? Icons.check_circle : Icons.block,
-                              color: u.aktif ? Colors.green : Colors.grey),
-                          title: Text(u.kullaniciAdi),
-                          subtitle: Text('${u.rol} • ${u.adSoyad ?? "-"}'),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () => _showUserDialog(u),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+          // --- Veritabanı Bilgisi ---
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.storage, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Veritabanı', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _dbInfoRow('Dosya Adı', AppConstants.dbName),
+                  _dbInfoRow('Konum', _dbPath.isNotEmpty ? p.dirname(_dbPath) : '-'),
+                  _dbInfoRow('Boyut', _dbSize > 0 ? _formatBytes(_dbSize) : '-'),
+                  _dbInfoRow('Şema Sürümü', AppConstants.dbVersion.toString()),
+                ],
               ),
             ),
+          ),
           const SizedBox(height: 16),
           // --- Loglar ---
           Card(
@@ -815,11 +818,24 @@ class _AyarlarPageState extends State<AyarlarPage> {
     );
   }
 
-  Future<void> _showUserDialog(User? user) async {
-    final res = await showDialog<bool>(
-      context: context,
-      builder: (_) => UserDialog(user: user),
+  Widget _dbInfoRow(String label, String value) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(label, style: TextStyle(
+              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              fontSize: 13,
+            )),
+          ),
+          Expanded(
+            child: Text(value, style: const TextStyle(fontSize: 13)),
+          ),
+        ],
+      ),
     );
-    if (res == true) _loadUsers();
   }
 }

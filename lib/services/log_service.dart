@@ -1,9 +1,7 @@
 import '../core/constants.dart';
 import '../core/date_util.dart';
 import '../data/models/log_entry.dart';
-import '../data/models/user.dart';
 import '../data/repositories/log_repository.dart';
-import 'auth_service.dart';
 import 'evrak_service.dart';
 import 'backup_service.dart';
 import 'export_service.dart';
@@ -14,13 +12,13 @@ import 'settings_service.dart';
 /// işlem tiplerini `Loglar` tablosuna yazar.
 class LogService {
   final LogRepository _repo;
-  User? _currentUser;
+  String? _currentUserName;
 
   LogService(this._repo);
 
-  void setCurrentUser(User? user) => _currentUser = user;
+  void setCurrentUser(String? userName) => _currentUserName = userName;
 
-  User? get currentUser => _currentUser;
+  String? get currentUserName => _currentUserName;
 
   Future<void> log(
     String islem, {
@@ -29,8 +27,7 @@ class LogService {
     String? aciklama,
   }) async {
     final entry = LogEntry(
-      kullaniciId: _currentUser?.id,
-      kullaniciAdi: _currentUser?.kullaniciAdi ?? 'Sistem',
+      kullaniciAdi: _currentUserName ?? 'Sistem',
       islem: islem,
       hedefTablo: hedefTablo,
       hedefId: hedefId,
@@ -50,11 +47,6 @@ class LogService {
   Future<int> deleteAll() => _repo.deleteAll();
 
   Future<String?> getOldestDate() => _repo.getOldestDate();
-
-  Future<void> logLogin(User user) => log(LogIslem.kullaniciGiris,
-      hedefTablo: 'Kullanicilar', hedefId: user.id, aciklama: user.kullaniciAdi);
-  Future<void> logLogout(User user) => log(LogIslem.kullaniciCikis,
-      hedefTablo: 'Kullanicilar', hedefId: user.id, aciklama: user.kullaniciAdi);
 }
 
 /// Uygulama genelinde tekil servis erişimi.
@@ -62,7 +54,6 @@ class Services {
   Services._();
 
   static late final LogService log;
-  static late final AuthService auth;
   static late final EvrakService evrak;
   static late final BackupService backup;
   static late final ExportService export;
@@ -72,14 +63,12 @@ class Services {
   static Future<void> init() async {
     final logRepo = LogRepository();
     log = LogService(logRepo);
-    auth = AuthService();
     evrak = EvrakService();
     backup = BackupService();
     export = ExportService();
     import = ImportService();
     settings = SettingsService();
 
-    await auth.ensureSeedAdmin();
     // Giriş öncesi loglar "Sistem" kullanıcısı ile yazılır.
     log.setCurrentUser(null);
   }
