@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path/path.dart' as p;
 import '../../core/date_util.dart';
+import '../../services/backup_service.dart';
 import '../../services/import_service.dart';
 import '../../services/log_service.dart';
 
@@ -98,6 +101,55 @@ class _IceAktarmaPageState extends State<IceAktarmaPage> {
       _loading = false;
       _importing = false;
     });
+  }
+
+  // --- Veritabanı İçe Aktarma ---
+
+  Future<void> _pickDb() async {
+    final res = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['db'],
+    );
+    if (res == null || res.paths.isEmpty) return;
+    final file = File(res.paths.first!);
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Veritabanını Geri Yükle'),
+        content: Text(
+          'Seçili dosya mevcut veritabanının üzerine yazılacak.\n\n'
+          '${p.basename(file.path)}\n\nBu işlem geri alınamaz. Devam edilsin mi?',
+        ),
+        actions: [
+          FilledButton.tonal(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('İptal'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Geri Yükle'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    try {
+      await Services.backup.restore(file.path);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Veritabanı başarıyla geri yüklendi. Uygulama yeniden başlatılıyor...')),
+        );
+        // Uygulamayı yeniden başlat
+        await Future.delayed(const Duration(seconds: 1));
+        if (mounted) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      }
+    } catch (e) {
+      _showError(e);
+    }
   }
 
   void _showResultDialog(ImportResult result) {
@@ -219,19 +271,81 @@ class _IceAktarmaPageState extends State<IceAktarmaPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('Excel\'den İçe Aktarma', style: theme.textTheme.titleLarge),
-          const SizedBox(height: 8),
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          Navigator.of(context).pop();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('İçe Aktarma'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+          Text('İçe Aktarma', style: theme.textTheme.titleLarge),
+          const SizedBox(height: 12),
+
+          // --- Veritabanı İçe Aktarma ---
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.storage, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Veritabanı İçe Aktarma', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Mevcut veritabanını bir .db dosyasıyla değiştirin. '
+                    'Bu işlem mevcut tüm verilerin üzerine yazılır.',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: _pickDb,
+                    icon: const Icon(Icons.file_upload),
+                    label: const Text('.db Dosyası Seç ve Geri Yükle'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // --- Excel İçe Aktarma ---
           Card(
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Icon(Icons.table_chart, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Excel İçe Aktarma', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
                   const Text(
                     'Beklenen kolon başlıkları: Tarih, Ad Soyad, Geldiği Yer, '
                     'Sayı, T.C. Kimlik No, Telefon No, Evrakı Alan.\n'
@@ -454,8 +568,10 @@ class _IceAktarmaPageState extends State<IceAktarmaPage> {
                 ),
               ),
             ),
-        ],
+          ],
+        ),
       ),
+    ),
     );
   }
 }

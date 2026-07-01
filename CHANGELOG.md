@@ -3,6 +3,17 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.2] — 2026-07-01
+
+### Eklendi
+- **Veritabanı İçe Aktarma**: İçe Aktarma sayfasına `.db` dosyasından geri yükleme desteği eklendi. Artık hem Excel hem de veritabanı dosyasından içe aktarma yapılabilir.
+- **İçe Aktarma sayfası yenilendi**: Sayfaya Scaffold + AppBar + ESC desteği eklendi. DB ve Excel bölümleri ikonlu başlıklarla ayrıldı.
+
+### Değişti
+- İçe Aktarma sayfası başlığı "Excel'den İçe Aktarma" → "İçe Aktarma" olarak güncellendi.
+
+---
+
 ## [1.5.1] — 2026-06-27
 
 ### Değişti
