@@ -3,6 +3,18 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.1] — 2026-06-27
+
+### Değişti
+- **Buton standardizasyonu**: Tüm sayfalarda action butonları `FilledButton` olarak tutarlı hale getirildi. `OutlinedButton`, `FilledButton.tonal`, `FilledButton.tonalIcon` kullanımı kaldırıldı. Açık ve koyu tema için `filledButtonTheme` + `outlinedButtonTheme` eklendi.
+- **Ayarlar sayfası ikonları**: Tüm bölüm başlıklarına ikon eklendi (Görünüm, Muhtarlık Bilgileri, Veritabanı, Log Yönetimi, Otomatik Arşivleme).
+
+### Düzeltildi
+- Evrak detay sayfasında Teslim Et (Filled) ile diğer butonlar (Outlined) farklı tipdeydi — hepsi FilledButton oldu.
+- Karanlık temada butonlar birbirinden görsel olarak çok farklı görünüyordu.
+
+---
+
 ## [1.5.0] — 2026-06-26
 
 ### Eklendi
