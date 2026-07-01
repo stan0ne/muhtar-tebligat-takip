@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../core/date_util.dart';
 import '../../data/models/evrak.dart';
@@ -120,16 +121,26 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.evrak != null;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(isEdit ? 'Evrak Düzenle' : 'Yeni Evrak Kaydı'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'Geri',
-          onPressed: () => Navigator.of(context).pop(false),
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          Navigator.of(context).pop(false);
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(isEdit ? 'Evrak Düzenle' : 'Yeni Evrak Kaydı'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            tooltip: 'Geri',
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
+        body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Center(
           child: ConstrainedBox(
@@ -230,6 +241,7 @@ class _EvrakFormPageState extends State<EvrakFormPage> {
           ),
         ),
       ),
+    ),
     );
   }
 }

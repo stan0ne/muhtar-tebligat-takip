@@ -2,7 +2,7 @@
 ; Bu dosyayi Inno Setup 6.x ile derleyerek setup.exe olusturun.
 
 #define MyAppName "Muhtar Tebligat Takip"
-#define MyAppVersion "1.4.0"
+#define MyAppVersion "1.5.0"
 #define MyAppPublisher "Muhtarlik Tebligat Takip Sistemi"
 #define MyAppExeName "muhtar_tebligat_takip.exe"
 

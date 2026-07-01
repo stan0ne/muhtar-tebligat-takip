@@ -3,7 +3,7 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
-## [1.4.0] — 2026-06-26
+## [1.5.0] — 2026-06-26
 
 ### Eklendi
 - **Otomatik arşivleme**: Ayarlar sayfasından açılıp kapatılabilir. Checkbox açıksa uygulama açılışında otomatik çalışır. Kriter: geliş tarihi bu yılın 1 Ocak'ından önce VE geliş tarihi seçili aydan eski. Ayarlar: ay eşiği (1-12), Geçmiş Yıllar checkbox'ı, son çalışma zamanı, önizleme, "Hemen Çalıştır" butonu.
