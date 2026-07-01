@@ -69,18 +69,23 @@ class EvrakDataTable extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: SingleChildScrollView(
                     child: DataTable(
+                      columnSpacing: 0,
                       headingRowColor: WidgetStateProperty.resolveWith((states) {
                         if (isLight) return const Color(0xFFE8EDF4);
                         return null;
                       }),
                       dataRowColor: WidgetStateProperty.resolveWith((states) {
                         if (!isLight) return null;
-                        // Zebra striping: çift satırlar açık gri
-                        return null; // Varsayılan beyaz
+                        return null;
                       }),
                       columns: [
+                        if (_isMultiSelect)
+                          DataColumn(label: SizedBox(width: 48)),
                         for (final c in columns)
-                          DataColumn(label: Text(c, style: headerStyle)),
+                          DataColumn(label: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(c, style: headerStyle),
+                          )),
                       ],
                       rows: [
                         for (final e in items)
@@ -101,54 +106,72 @@ class EvrakDataTable extends StatelessWidget {
                                 : (_) => onRowTap(e),
                             cells: [
                               if (_isMultiSelect)
-                                DataCell(SizedBox(
-                                  width: 40,
-                                  child: Checkbox(
-                                    value: selectedIds!.contains(e.id),
-                                    onChanged: (val) {
-                                      final newSet = Set<int>.from(selectedIds!);
-                                      if (val == true) {
-                                        newSet.add(e.id!);
-                                      } else {
-                                        newSet.remove(e.id!);
-                                      }
-                                      onSelectionChanged!(newSet);
-                                    },
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  child: SizedBox(
+                                    width: 40,
+                                    child: Checkbox(
+                                      value: selectedIds!.contains(e.id),
+                                      onChanged: (val) {
+                                        final newSet = Set<int>.from(selectedIds!);
+                                        if (val == true) {
+                                          newSet.add(e.id!);
+                                        } else {
+                                          newSet.remove(e.id!);
+                                        }
+                                        onSelectionChanged!(newSet);
+                                      },
+                                    ),
                                   ),
                                 )),
-                              DataCell(SizedBox(
-                                width: 180,
-                                child: GestureDetector(
-                                  onTap: () => onRowTap(e),
-                                  child: Text(e.adSoyad, style: cellStyle, overflow: TextOverflow.ellipsis),
+                              DataCell(Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: SizedBox(
+                                  width: 180,
+                                  child: GestureDetector(
+                                    onTap: () => onRowTap(e),
+                                    child: Text(e.adSoyad, style: cellStyle, overflow: TextOverflow.ellipsis),
+                                  ),
                                 ),
                               )),
-                              DataCell(SizedBox(
-                                width: 200,
-                                child: GestureDetector(
-                                  onTap: () => onRowTap(e),
-                                  child: Text(e.geldigiKurum ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
+                              DataCell(Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: SizedBox(
+                                  width: 200,
+                                  child: GestureDetector(
+                                    onTap: () => onRowTap(e),
+                                    child: Text(e.geldigiKurum ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
+                                  ),
                                 ),
                               )),
-                              DataCell(SizedBox(
-                                width: 100,
-                                child: GestureDetector(
-                                  onTap: () => onRowTap(e),
-                                  child: Text(e.evrakSayisi ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
+                              DataCell(Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: SizedBox(
+                                  width: 50,
+                                  child: GestureDetector(
+                                    onTap: () => onRowTap(e),
+                                    child: Text(e.evrakSayisi ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
+                                  ),
                                 ),
                               )),
-                              DataCell(SizedBox(
-                                width: 110,
-                                child: GestureDetector(
-                                  onTap: () => onRowTap(e),
-                                  child: Text(DateUtil.displayDate(dateGetter(e)), style: cellStyle),
+                              DataCell(Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: SizedBox(
+                                  width: 55,
+                                  child: GestureDetector(
+                                    onTap: () => onRowTap(e),
+                                    child: Text(DateUtil.displayDate(dateGetter(e)), style: cellStyle),
+                                  ),
                                 ),
                               )),
-                              DataCell(SizedBox(
-                                width: 110,
-                                child: GestureDetector(
-                                  onTap: () => onRowTap(e),
-                                  child: UiUtil.durumChip(context, e.durum),
+                              DataCell(Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: SizedBox(
+                                  width: 110,
+                                  child: GestureDetector(
+                                    onTap: () => onRowTap(e),
+                                    child: UiUtil.durumChip(context, e.durum),
+                                  ),
                                 ),
                               )),
                             ],
