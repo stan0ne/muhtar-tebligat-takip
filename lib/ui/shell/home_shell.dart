@@ -4,7 +4,6 @@ import '../pages/evrak_form_page.dart';
 import '../pages/evrak_ara_page.dart';
 import '../pages/evrak_liste_page.dart';
 import '../pages/raporlar_page.dart';
-import '../pages/ice_aktarma_page.dart';
 import '../pages/yedekleme_page.dart';
 import '../pages/ayarlar_page.dart';
 import 'menu_page.dart';
@@ -50,8 +49,6 @@ class _HomeShellState extends State<HomeShell> {
         return const EvrakListePage.durumArsivlendi(key: ValueKey('arsivlenen'));
       case MenuPage.raporlar:
         return const RaporlarPage();
-      case MenuPage.iceAktarma:
-        return const IceAktarmaPage();
       case MenuPage.yedekleme:
         return const YedeklemePage();
       case MenuPage.ayarlar:

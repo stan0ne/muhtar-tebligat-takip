@@ -7,8 +7,10 @@ import '../../core/date_util.dart';
 import '../../data/database/database_helper.dart';
 import '../../services/evrak_service.dart';
 import '../../services/log_service.dart';
+import '../../services/backup_service.dart';
 import '../providers/app_provider.dart';
 import '../pages/evrak_detail_page.dart';
+import '../pages/ice_aktarma_page.dart';
 import 'widgets/log_viewer_dialog.dart';
 
 /// Ayarlar: tema, muhtarlık bilgileri, loglar, veritabanı bilgisi.
@@ -364,6 +366,55 @@ class _AyarlarPageState extends State<AyarlarPage> {
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 
+  // --- İçe Aktarma / Dışa Aktarma ---
+
+  void _showImportDialog() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const IceAktarmaPage()),
+    );
+  }
+
+  Future<void> _exportDatabase() async {
+    final externalPath = await Services.backup.getExternalPath();
+    if (externalPath == null || externalPath.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Önce Yedekleme sayfasından harici konum ayarlayın.')),
+        );
+      }
+      return;
+    }
+
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Veritabanını Dışa Aktar'),
+        content: Text('Veritabanı şu konuma kopyalanacak:\n$externalPath\n\nDevam edilsin mi?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Aktar')),
+        ],
+      ),
+    );
+    if (onay != true) return;
+
+    try {
+      final file = await Services.backup.backupToExternal();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Veritabanı dışa aktarıldı: ${file.path}')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Hata: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
@@ -498,6 +549,28 @@ class _AyarlarPageState extends State<AyarlarPage> {
                   _dbInfoRow('Konum', _dbPath.isNotEmpty ? p.dirname(_dbPath) : '-'),
                   _dbInfoRow('Boyut', _dbSize > 0 ? _formatBytes(_dbSize) : '-'),
                   _dbInfoRow('Şema Sürümü', AppConstants.dbVersion.toString()),
+                  const SizedBox(height: 12),
+                  const Divider(height: 1),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _showImportDialog(),
+                          icon: const Icon(Icons.file_upload),
+                          label: const Text('İçe Aktarma'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _exportDatabase(),
+                          icon: const Icon(Icons.file_download),
+                          label: const Text('Dışa Aktar'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
