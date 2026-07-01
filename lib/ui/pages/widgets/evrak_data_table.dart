@@ -101,37 +101,55 @@ class EvrakDataTable extends StatelessWidget {
                                 : (_) => onRowTap(e),
                             cells: [
                               if (_isMultiSelect)
-                                DataCell(Checkbox(
-                                  value: selectedIds!.contains(e.id),
-                                  onChanged: (val) {
-                                    final newSet = Set<int>.from(selectedIds!);
-                                    if (val == true) {
-                                      newSet.add(e.id!);
-                                    } else {
-                                      newSet.remove(e.id!);
-                                    }
-                                    onSelectionChanged!(newSet);
-                                  },
+                                DataCell(SizedBox(
+                                  width: 40,
+                                  child: Checkbox(
+                                    value: selectedIds!.contains(e.id),
+                                    onChanged: (val) {
+                                      final newSet = Set<int>.from(selectedIds!);
+                                      if (val == true) {
+                                        newSet.add(e.id!);
+                                      } else {
+                                        newSet.remove(e.id!);
+                                      }
+                                      onSelectionChanged!(newSet);
+                                    },
+                                  ),
                                 )),
-                              DataCell(GestureDetector(
-                                onTap: () => onRowTap(e),
-                                child: Text(e.adSoyad, style: cellStyle),
+                              DataCell(SizedBox(
+                                width: 180,
+                                child: GestureDetector(
+                                  onTap: () => onRowTap(e),
+                                  child: Text(e.adSoyad, style: cellStyle, overflow: TextOverflow.ellipsis),
+                                ),
                               )),
-                              DataCell(GestureDetector(
-                                onTap: () => onRowTap(e),
-                                child: Text(e.geldigiKurum ?? '-', style: cellStyle),
+                              DataCell(SizedBox(
+                                width: 200,
+                                child: GestureDetector(
+                                  onTap: () => onRowTap(e),
+                                  child: Text(e.geldigiKurum ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
+                                ),
                               )),
-                              DataCell(GestureDetector(
-                                onTap: () => onRowTap(e),
-                                child: Text(e.evrakSayisi ?? '-', style: cellStyle),
+                              DataCell(SizedBox(
+                                width: 100,
+                                child: GestureDetector(
+                                  onTap: () => onRowTap(e),
+                                  child: Text(e.evrakSayisi ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
+                                ),
                               )),
-                              DataCell(GestureDetector(
-                                onTap: () => onRowTap(e),
-                                child: Text(DateUtil.displayDate(dateGetter(e)), style: cellStyle),
+                              DataCell(SizedBox(
+                                width: 110,
+                                child: GestureDetector(
+                                  onTap: () => onRowTap(e),
+                                  child: Text(DateUtil.displayDate(dateGetter(e)), style: cellStyle),
+                                ),
                               )),
-                              DataCell(GestureDetector(
-                                onTap: () => onRowTap(e),
-                                child: UiUtil.durumChip(context, e.durum),
+                              DataCell(SizedBox(
+                                width: 110,
+                                child: GestureDetector(
+                                  onTap: () => onRowTap(e),
+                                  child: UiUtil.durumChip(context, e.durum),
+                                ),
                               )),
                             ],
                           ),
