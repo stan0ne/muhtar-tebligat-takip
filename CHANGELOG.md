@@ -3,6 +3,14 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.3] — 2026-07-01
+
+### Düzeltildi
+- **Tablo sütun taşması**: Evrak Ara ve Bekleyen Evraklar sayfalarında sütunlar pencereye sığmıyordu. Checkbox sütunu 40px'e sabitlendi, Ad Soyad/Geldiği Kurum/Evrak Sayısı sütunları max genişlik + ellipsis ile kısıtlandı.
+- **Checkbox sütunu tutarsızlığı**: Tüm sayfalarda checkbox sütunu artık aynı genişlikte (40px).
+
+---
+
 ## [1.5.2] — 2026-07-01
 
 ### Eklendi
