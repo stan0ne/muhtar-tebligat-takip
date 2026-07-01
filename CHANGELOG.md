@@ -28,6 +28,9 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - Kullanıcı bilgi alanı / çıkış butonu kaldırıldı.
 - Auth servisleri (AuthService, UserRepository, CryptoUtil) kaldırıldı — artık kullanılmıyor.
 - İçe Aktarma menüden kaldırıldı, Ayarlar > Veritabanı altına taşındı.
+- **Açık tema iyileştirmesi**: Metin renkleri koyulaştırıldı (#1A1A1A), tüm başlık ve gövde metinleri w500/w700 ağırlığına yükseltildi. NavigationRail menü fontları kalınlaştırıldı.
+- **Dashboard kartları**: Başlık ve değer fontları okunur hale getirildi (w500/w700).
+- **Evrak listeleri**: Sütun başlıkları koyu arka plan + bold; zebra striping (alternatif satır rengi) eklendi; hücre metinleri w500 ağırlığında.
 - Veritabanı v1 → v2 (DurumGecmisleri tablosu eklendi).
 - Yedekleme sayfası yeniden yapılandırıldı (Dahili, Harici, Bulut bölümleri).
 
