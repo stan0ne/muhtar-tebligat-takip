@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
@@ -376,21 +377,23 @@ class _AyarlarPageState extends State<AyarlarPage> {
   }
 
   Future<void> _exportDatabase() async {
-    final externalPath = await Services.backup.getExternalPath();
-    if (externalPath == null || externalPath.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Önce Yedekleme sayfasından harici konum ayarlayın.')),
-        );
-      }
-      return;
+    String? targetPath = await Services.backup.getExternalPath();
+
+    // Harici konum ayarlanmamışsa klasör seçtir
+    if (targetPath == null || targetPath.isEmpty) {
+      final result = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: 'Veritabanını kaydedeceği klasörü seçin',
+      );
+      if (result == null) return; // iptal
+      targetPath = result;
+      await Services.backup.setExternalPath(targetPath);
     }
 
     final onay = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Veritabanını Dışa Aktar'),
-        content: Text('Veritabanı şu konuma kopyalanacak:\n$externalPath\n\nDevam edilsin mi?'),
+        content: Text('Veritabanı şu konuma kopyalanacak:\n$targetPath\n\nDevam edilsin mi?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('İptal')),
           FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Aktar')),
