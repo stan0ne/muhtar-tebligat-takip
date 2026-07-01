@@ -35,8 +35,14 @@
 ## Önizleme
 
 <p align="center">
-  <img src="dashboard.png" alt="Uygulama Önizleme" width="800">
+  <a href="dashboard.png"><img src="dashboard.png" alt="Dashboard" width="800"></a>
 </p>
+
+| Ekran | Açıklama |
+|---|---|
+| [![Dashboard](dashboard2.png)](dashboard2.png) | **Bekleyen Evraklar** — Ana sayfa görünümü |
+| [![Evrak Detayı](dashboard3.png)](dashboard3.png) | **Evrak Detayı** — Durum geçmişi ve teslim bilgileri |
+| [![Teslim Edilenler](dashboard4.png)](dashboard4.png) | **Teslim Edilen Evrak** — Teslim kayıtları görünümü |
 
 ## Kurulum & Çalıştırma
 
