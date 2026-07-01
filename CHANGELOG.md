@@ -17,14 +17,21 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 - **Windows Installer (MSI)**: WiX v7 ile .msi paketi. Program Files'a kurulum, Program Ekle/Kaldır'da görünür.
 - **Windows Installer (EXE)**: Inno Setup 6 ile .exe kurucu. Admin yetkisi ile Program Files'a kurulum.
 - **MSIX paketi**: `dart run msix:create` ile modern Windows paketleme.
+- **Veritabanı bilgisi**: Ayarlar sayfasında dosya adı, konum, boyut ve şema sürümü gösterilir.
 - **Bağımlılık güncellemeleri**: flutter_localizations, intl, syncfusion_flutter_xlsio, file_picker, googleapis, googleapis_auth.
 - **GitHub Actions CI/CD**: `v*` tag push'unda otomatik build + release.
 
 ### Değişti
 - Login ekranı kaldırıldı — uygulama doğrudan açılır.
 - Kullanıcı bilgi alanı / çıkış butonu kaldırıldı.
+- Auth servisleri (AuthService, UserRepository, CryptoUtil) kaldırıldı — artık kullanılmıyor.
 - Veritabanı v1 → v2 (DurumGecmisleri tablosu eklendi).
 - Yedekleme sayfası yeniden yapılandırıldı (Dahili, Harici, Bulut bölümleri).
+
+### Temizlendi
+- GEMINI.md, AGENTS.md, PROJECT_STATUS.md, Prompt.md repodan kaldırıldı.
+- Auth ile ilgili dosyalar silindi (user.dart, user_repository.dart, auth_service.dart, crypto_util.dart, login_screen.dart, user_dialog.dart).
+- Otomatik üretilen dosyalar (.gitignore'a eklendi).
 
 ---
 

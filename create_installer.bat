@@ -27,7 +27,7 @@ echo.
 echo [3/5] MSI (WiX) derleniyor...
 where wix >nul 2>nul
 if %errorlevel% equ 0 (
-    wix build -o "installer\muhtar_tebligat_takip_msi_1.3.0.msi" -b "%~dp0" -ext WixToolset.UI.wixext installer.wxs
+    wix build -o "installer\muhtar_tebligat_takip_setup_1.3.0.msi" -b "%~dp0" -ext WixToolset.UI.wixext installer.wxs
     if %errorlevel% neq 0 (
         echo UYARI: WiX MSI derlemesi basarisiz!
     ) else (
@@ -63,8 +63,8 @@ echo Olusturulan dosyalar:
 if exist "installer\muhtar_tebligat_takip_1.3.0.msix" (
     echo   MSIX: installer\muhtar_tebligat_takip_1.3.0.msix
 )
-if exist "installer\muhtar_tebligat_takip_msi_1.3.0.msi" (
-    echo   MSI:  installer\muhtar_tebligat_takip_msi_1.3.0.msi
+if exist "installer\muhtar_tebligat_takip_setup_1.3.0.msi" (
+    echo   MSI:  installer\muhtar_tebligat_takip_setup_1.3.0.msi
 )
 if exist "installer\muhtar_tebligat_takip_setup_1.3.0.exe" (
     echo   EXE:  installer\muhtar_tebligat_takip_setup_1.3.0.exe
