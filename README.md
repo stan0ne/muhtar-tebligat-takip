@@ -32,6 +32,12 @@
 - **Tarih formatı**: DD-MM-YYYY (görüntüleme), YYYY-MM-DD (veritabanı)
 - **Kurulum**: MSIX (modern Windows paketleme, Microsoft Store desteği)
 
+## Önizleme
+
+<p align="center">
+  <img src="dashboard.png" alt="Uygulama Önizleme" width="800">
+</p>
+
 ## Kurulum & Çalıştırma
 
 ### Gereksinimler
