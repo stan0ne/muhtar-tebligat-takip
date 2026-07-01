@@ -55,6 +55,7 @@ class UiUtil {
     final theme = Theme.of(ctx);
     final screenWidth = MediaQuery.of(ctx).size.width;
     final scale = (screenWidth / 1170).clamp(0.8, 1.5);
+    final isLight = theme.brightness == Brightness.light;
 
     final iconSize = 26 * scale;
     final avatarRadius = 26 * scale;
@@ -81,14 +82,16 @@ class UiUtil {
                 children: [
                   Text(title,
                       style: TextStyle(
-                        color: theme.hintColor,
+                        color: isLight ? const Color(0xFF3A3A3A) : theme.hintColor,
                         fontSize: titleSize,
+                        fontWeight: isLight ? FontWeight.w500 : FontWeight.w400,
                       )),
                   const SizedBox(height: 6),
                   Text('$value',
                       style: TextStyle(
                         fontSize: valueSize,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
+                        color: isLight ? const Color(0xFF1A1A1A) : null,
                       )),
                 ],
               ),

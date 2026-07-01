@@ -41,9 +41,24 @@ class EvrakDataTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isLight = theme.brightness == Brightness.light;
     final columns = _isMultiSelect
         ? ['', 'Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', dateColumnLabel, 'Durum']
         : ['Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', dateColumnLabel, 'Durum'];
+
+    // Açık tema için sütun başlık stili
+    final headerStyle = TextStyle(
+      fontWeight: FontWeight.w700,
+      fontSize: 13,
+      color: isLight ? const Color(0xFF1A1A1A) : null,
+    );
+
+    // Açık tema için hücre metin stili
+    final cellStyle = TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 13,
+      color: isLight ? const Color(0xFF2A2A2A) : null,
+    );
 
     return Column(
       children: [
@@ -54,14 +69,33 @@ class EvrakDataTable extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: SingleChildScrollView(
                     child: DataTable(
+                      headingRowColor: WidgetStateProperty.resolveWith((states) {
+                        if (isLight) return const Color(0xFFE8EDF4);
+                        return null;
+                      }),
+                      dataRowColor: WidgetStateProperty.resolveWith((states) {
+                        if (!isLight) return null;
+                        // Zebra striping: çift satırlar açık gri
+                        return null; // Varsayılan beyaz
+                      }),
                       columns: [
                         for (final c in columns)
-                          DataColumn(label: Text(c, style: const TextStyle(fontWeight: FontWeight.bold))),
+                          DataColumn(label: Text(c, style: headerStyle)),
                       ],
                       rows: [
                         for (final e in items)
                           DataRow.byIndex(
                             index: items.indexOf(e),
+                            color: isLight
+                                ? WidgetStateProperty.resolveWith((states) {
+                                    // Zebra striping
+                                    final idx = items.indexOf(e);
+                                    if (idx.isEven) {
+                                      return Colors.white;
+                                    }
+                                    return const Color(0xFFF8F9FC);
+                                  })
+                                : null,
                             onSelectChanged: _isMultiSelect
                                 ? null
                                 : (_) => onRowTap(e),
@@ -81,19 +115,19 @@ class EvrakDataTable extends StatelessWidget {
                                 )),
                               DataCell(GestureDetector(
                                 onTap: () => onRowTap(e),
-                                child: Text(e.adSoyad),
+                                child: Text(e.adSoyad, style: cellStyle),
                               )),
                               DataCell(GestureDetector(
                                 onTap: () => onRowTap(e),
-                                child: Text(e.geldigiKurum ?? '-'),
+                                child: Text(e.geldigiKurum ?? '-', style: cellStyle),
                               )),
                               DataCell(GestureDetector(
                                 onTap: () => onRowTap(e),
-                                child: Text(e.evrakSayisi ?? '-'),
+                                child: Text(e.evrakSayisi ?? '-', style: cellStyle),
                               )),
                               DataCell(GestureDetector(
                                 onTap: () => onRowTap(e),
-                                child: Text(DateUtil.displayDate(dateGetter(e))),
+                                child: Text(DateUtil.displayDate(dateGetter(e)), style: cellStyle),
                               )),
                               DataCell(GestureDetector(
                                 onTap: () => onRowTap(e),
