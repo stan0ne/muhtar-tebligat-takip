@@ -44,6 +44,10 @@ class EvrakDataTable extends StatelessWidget {
     final isLight = theme.brightness == Brightness.light;
     final columns = ['Ad Soyad', 'Geldiği Kurum', 'Evrak Sayısı', dateColumnLabel, 'Durum'];
 
+    // Tam ekran kontrolü: genişlik 1100px ve üzeriyse merkeze hizala
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isFullScreen = screenWidth >= 1100;
+
     // Açık tema için sütun başlık stili
     final headerStyle = TextStyle(
       fontWeight: FontWeight.w700,
@@ -63,115 +67,115 @@ class EvrakDataTable extends StatelessWidget {
         Expanded(
           child: items.isEmpty
               ? const Center(child: Text('Kayıt bulunamadı.'))
-              : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
+              : Align(
+                  alignment: isFullScreen ? Alignment.center : Alignment.centerLeft,
                   child: SingleChildScrollView(
-                    child: DataTable(
-                      columnSpacing: 0,
-                      headingRowColor: WidgetStateProperty.resolveWith((states) {
-                        if (isLight) return const Color(0xFFE8EDF4);
-                        return null;
-                      }),
-                      dataRowColor: WidgetStateProperty.resolveWith((states) {
-                        if (!isLight) return null;
-                        return null;
-                      }),
-                      columns: [
-                        if (_isMultiSelect)
-                          DataColumn(label: SizedBox(width: 48)),
-                        for (final c in columns)
-                          DataColumn(label: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(c, style: headerStyle),
-                          )),
-                      ],
-                      rows: [
-                        for (final e in items)
-                          DataRow.byIndex(
-                            index: items.indexOf(e),
-                            color: isLight
-                                ? WidgetStateProperty.resolveWith((states) {
-                                    // Zebra striping
-                                    final idx = items.indexOf(e);
-                                    if (idx.isEven) {
-                                      return Colors.white;
-                                    }
-                                    return const Color(0xFFF8F9FC);
-                                  })
-                                : null,
-                            onSelectChanged: _isMultiSelect
-                                ? null
-                                : (_) => onRowTap(e),
-                            cells: [
-                              if (_isMultiSelect)
+                    scrollDirection: Axis.horizontal,
+                    child: SingleChildScrollView(
+                      child: DataTable(
+                        columnSpacing: 0,
+                        headingRowColor: WidgetStateProperty.resolveWith((states) {
+                          if (isLight) return const Color(0xFFE8EDF4);
+                          return null;
+                        }),
+                        dataRowColor: WidgetStateProperty.resolveWith((states) {
+                          if (!isLight) return null;
+                          return null;
+                        }),
+                        columns: [
+                          if (_isMultiSelect)
+                            DataColumn(label: SizedBox(width: 48)),
+                          for (final c in columns)
+                            DataColumn(label: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(c, style: headerStyle),
+                            )),
+                        ],
+                        rows: [
+                          for (final e in items)
+                            DataRow.byIndex(
+                              index: items.indexOf(e),
+                              color: isLight
+                                  ? WidgetStateProperty.resolveWith((states) {
+                                      final idx = items.indexOf(e);
+                                      if (idx.isEven) return Colors.white;
+                                      return const Color(0xFFF8F9FC);
+                                    })
+                                  : null,
+                              onSelectChanged: _isMultiSelect
+                                  ? null
+                                  : (_) => onRowTap(e),
+                              cells: [
+                                if (_isMultiSelect)
+                                  DataCell(Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                                    child: SizedBox(
+                                      width: 40,
+                                      child: Checkbox(
+                                        value: selectedIds!.contains(e.id),
+                                        onChanged: (val) {
+                                          final newSet = Set<int>.from(selectedIds!);
+                                          if (val == true) {
+                                            newSet.add(e.id!);
+                                          } else {
+                                            newSet.remove(e.id!);
+                                          }
+                                          onSelectionChanged!(newSet);
+                                        },
+                                      ),
+                                    ),
+                                  )),
                                 DataCell(Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
                                   child: SizedBox(
-                                    width: 40,
-                                    child: Checkbox(
-                                      value: selectedIds!.contains(e.id),
-                                      onChanged: (val) {
-                                        final newSet = Set<int>.from(selectedIds!);
-                                        if (val == true) {
-                                          newSet.add(e.id!);
-                                        } else {
-                                          newSet.remove(e.id!);
-                                        }
-                                        onSelectionChanged!(newSet);
-                                      },
+                                    width: 180,
+                                    child: GestureDetector(
+                                      onTap: () => onRowTap(e),
+                                      child: Text(e.adSoyad, style: cellStyle, overflow: TextOverflow.ellipsis),
                                     ),
                                   ),
                                 )),
-                              DataCell(Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: SizedBox(
-                                  width: 180,
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: SizedBox(
+                                    width: 200,
+                                    child: GestureDetector(
+                                      onTap: () => onRowTap(e),
+                                      child: Text(e.geldigiKurum ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
+                                    ),
+                                  ),
+                                )),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: SizedBox(
+                                    width: 72,
+                                    child: GestureDetector(
+                                      onTap: () => onRowTap(e),
+                                      child: Text(e.evrakSayisi ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
+                                    ),
+                                  ),
+                                )),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: SizedBox(
+                                    width: 73,
+                                    child: GestureDetector(
+                                      onTap: () => onRowTap(e),
+                                      child: Text(DateUtil.displayDate(dateGetter(e)), style: cellStyle),
+                                    ),
+                                  ),
+                                )),
+                                DataCell(Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
                                   child: GestureDetector(
                                     onTap: () => onRowTap(e),
-                                    child: Text(e.adSoyad, style: cellStyle, overflow: TextOverflow.ellipsis),
+                                    child: UiUtil.durumChip(context, e.durum),
                                   ),
-                                ),
-                              )),
-                              DataCell(Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: SizedBox(
-                                  width: 200,
-                                  child: GestureDetector(
-                                    onTap: () => onRowTap(e),
-                                    child: Text(e.geldigiKurum ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
-                                  ),
-                                ),
-                              )),
-                              DataCell(Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: SizedBox(
-                                  width: 60,
-                                  child: GestureDetector(
-                                    onTap: () => onRowTap(e),
-                                    child: Text(e.evrakSayisi ?? '-', style: cellStyle, overflow: TextOverflow.ellipsis),
-                                  ),
-                                ),
-                              )),
-                              DataCell(Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: SizedBox(
-                                  width: 66,
-                                  child: GestureDetector(
-                                    onTap: () => onRowTap(e),
-                                    child: Text(DateUtil.displayDate(dateGetter(e)), style: cellStyle),
-                                  ),
-                                ),
-                              )),
-                              DataCell(Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: GestureDetector(
-                                  onTap: () => onRowTap(e),
-                                  child: UiUtil.durumChip(context, e.durum),
-                                ),
-                              )),
-                            ],
-                          ),
-                      ],
+                                )),
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

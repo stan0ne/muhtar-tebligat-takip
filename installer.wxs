@@ -3,7 +3,7 @@
      xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <Package Name="Muhtar Tebligat Takip"
            Manufacturer="Muhtarlik Tebligat Takip Sistemi"
-           Version="1.5.3"
+           Version="1.5.4"
            UpgradeCode="B8E7C9A2-4F3D-4E5A-9C1B-2D6F8A3E7C9D"
            Scope="perMachine"
            Codepage="1254"

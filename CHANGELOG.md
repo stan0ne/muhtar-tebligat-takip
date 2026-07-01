@@ -3,6 +3,15 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.4] — 2026-07-01
+
+### Düzeltildi
+- **Tablo hizalama**: Bekleyen Evraklar, Teslim Edilenler, Arşivlenenler ve Evrak Ara sayfalarında tablo sola yaslandı. Tam ekran modunda (1100px+) tablo ortalanır.
+- **Bekleyen Evraklar checkbox eksikliği**: Bekleyen Evraklar sayfasında çoklu seçim checkbox'ının görünmemesi sorunu giderildi.
+- **Sütun genişlikleri**: Geliş/Teslim Tarihi sütunu %10 (66→73px), Evrak Sayısı sütunu %20 (60→72px) genişletildi.
+
+---
+
 ## [1.5.3] — 2026-07-01
 
 ### Düzeltildi
