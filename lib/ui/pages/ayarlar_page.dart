@@ -437,7 +437,13 @@ class _AyarlarPageState extends State<AyarlarPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Görünüm', style: theme.textTheme.titleMedium),
+                  Row(
+                    children: [
+                      Icon(Icons.palette, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Görünüm', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
                   const SizedBox(height: 8),
                   SegmentedButton<ThemeMode>(
                     segments: const [
@@ -460,7 +466,13 @@ class _AyarlarPageState extends State<AyarlarPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Muhtarlık Bilgileri', style: theme.textTheme.titleMedium),
+                  Row(
+                    children: [
+                      Icon(Icons.account_balance, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Muhtarlık Bilgileri', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -600,7 +612,13 @@ class _AyarlarPageState extends State<AyarlarPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Log Yönetimi', style: theme.textTheme.titleMedium),
+                  Row(
+                    children: [
+                      Icon(Icons.cleaning_services, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Log Yönetimi', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
