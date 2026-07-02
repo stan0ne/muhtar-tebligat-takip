@@ -3,6 +3,21 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.5] — 2026-07-02
+
+### Değişti
+- **Yedekleme menüsü taşındı**: Yedekleme menüsü sidebar'dan kaldırıldı, Ayarlar sayfasının altına taşındı.
+- **Bulut Yedekleme kaldırıldı**: Çalışmayan Google Drive ve OneDrive entegrasyonu kaldırıldı.
+
+### Eklendi
+- **Tablo tam genişlik**: Tüm tablolar LayoutBuilder ile mevcut pencere genişliğini dolduruyor.
+- **Tümünü seç checkbox'ı**: Bekleyen Evraklar tablosu header satırına "tümünü seç" checkbox'ı eklendi.
+- **Tooltip hover**: Tablo hücrelerinde 1 saniye bekleyince tam içerik tooltip olarak görünüyor.
+- **Durum chip genişliği**: Durum sütunu chip'in kendi genişliğine göre boyutlandırıldı.
+- **Evrak Ara filtreleri yeniden tasarlandı**: Kart içinde düzenli 2 satıra taşındı.
+
+---
+
 ## [1.5.4] — 2026-07-01
 
 ### Düzeltildi

@@ -9,7 +9,6 @@ enum MenuPage {
   teslimEdilen('Teslim Edilenler', Icons.check_circle_outline, Icons.check_circle),
   arsivlenen('Arşivlenenler', Icons.archive_outlined, Icons.archive),
   raporlar('Raporlar', Icons.bar_chart_outlined, Icons.bar_chart),
-  yedekleme('Yedekleme', Icons.backup_outlined, Icons.backup),
   ayarlar('Ayarlar', Icons.settings_outlined, Icons.settings);
 
   final String title;

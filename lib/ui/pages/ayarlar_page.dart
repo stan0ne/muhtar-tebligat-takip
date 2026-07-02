@@ -6,12 +6,11 @@ import 'package:provider/provider.dart';
 import '../../core/constants.dart';
 import '../../core/date_util.dart';
 import '../../data/database/database_helper.dart';
-import '../../services/evrak_service.dart';
 import '../../services/log_service.dart';
-import '../../services/backup_service.dart';
 import '../providers/app_provider.dart';
 import '../pages/evrak_detail_page.dart';
 import '../pages/ice_aktarma_page.dart';
+import '../pages/yedekleme_page.dart';
 import 'widgets/log_viewer_dialog.dart';
 
 /// Ayarlar: tema, muhtarlık bilgileri, loglar, veritabanı bilgisi.
@@ -896,6 +895,22 @@ class _AyarlarPageState extends State<AyarlarPage> {
                   ),
                 ],
               ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // --- Yedekleme ---
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.backup),
+              title: const Text('Yedekleme'),
+              subtitle: const Text('Dahili ve harici yedekleme ayarları.'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const YedeklemePage()),
+                );
+              },
             ),
           ),
           const SizedBox(height: 24),

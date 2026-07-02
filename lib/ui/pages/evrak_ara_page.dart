@@ -154,140 +154,86 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Filtreler
-          Wrap(
-            spacing: 12,
-            runSpacing: 8,
-            children: [
-              SizedBox(
-                width: 220,
-                child: TextField(
-                  controller: _adCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Ad Soyad',
-                    prefixIcon: Icon(Icons.person),
-                    isDense: true,
-                    border: OutlineInputBorder(),
+          // Filtreler kartı
+          Card(
+            elevation: 0,
+            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.filter_list, size: 18, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Arama Filtreleri', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                      const Spacer(),
+                      FilledButton.tonalIcon(
+                        onPressed: _clear,
+                        icon: const Icon(Icons.clear_all, size: 18),
+                        label: const Text('Temizle'),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              SizedBox(
-                width: 180,
-                child: TextField(
-                  controller: _sayiCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Evrak Sayısı',
-                    prefixIcon: Icon(Icons.numbers),
-                    isDense: true,
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 12),
+                  // Satır 1: Kişisel Bilgiler
+                  Row(
+                    children: [
+                      Expanded(child: _filterField(_adCtrl, 'Ad Soyad', Icons.person)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _filterField(_sayiCtrl, 'Evrak Sayısı', Icons.numbers)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _filterField(_kurumCtrl, 'Geldiği Kurum', Icons.account_balance)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _filterField(_teslimAlanCtrl, 'Teslim Alan', Icons.how_to_reg)),
+                    ],
                   ),
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: TextField(
-                  controller: _kurumCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Geldiği Kurum',
-                    prefixIcon: Icon(Icons.account_balance),
-                    isDense: true,
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 12),
+                  // Satır 2: İletişim + Tarih + Durum
+                  Row(
+                    children: [
+                      Expanded(child: _filterField(_tcCtrl, 'TC Kimlik No', Icons.badge)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _filterField(_telefonCtrl, 'Telefon', Icons.phone)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _filterField(_basCtrl, 'Başlangıç Tarihi', Icons.calendar_today, readOnly: true, onTap: () => _pickDate(_basCtrl))),
+                      const SizedBox(width: 12),
+                      Expanded(child: _filterField(_sonCtrl, 'Bitiş Tarihi', Icons.calendar_today, readOnly: true, onTap: () => _pickDate(_sonCtrl))),
+                      const SizedBox(width: 12),
+                      SizedBox(
+                        width: 160,
+                        child: DropdownButtonFormField<String>(
+                          initialValue: _durum,
+                          decoration: const InputDecoration(
+                            labelText: 'Durum',
+                            isDense: true,
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.flag, size: 20),
+                          ),
+                          items: [
+                            const DropdownMenuItem(value: null, child: Text('Tümü')),
+                            for (final d in EvrakDurum.all)
+                              DropdownMenuItem(value: d, child: Text(d)),
+                          ],
+                          onChanged: (v) {
+                            setState(() => _durum = v);
+                            _page = 1;
+                            _search();
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
-              SizedBox(
-                width: 200,
-                child: TextField(
-                  controller: _teslimAlanCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Teslim Alan',
-                    prefixIcon: Icon(Icons.how_to_reg),
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 180,
-                child: TextField(
-                  controller: _tcCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'TC Kimlik No',
-                    prefixIcon: Icon(Icons.badge),
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 160,
-                child: TextField(
-                  controller: _telefonCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Telefon',
-                    prefixIcon: Icon(Icons.phone),
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 160,
-                child: TextField(
-                  controller: _basCtrl,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Başlangıç',
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                  ),
-                  onTap: () => _pickDate(_basCtrl),
-                ),
-              ),
-              SizedBox(
-                width: 160,
-                child: TextField(
-                  controller: _sonCtrl,
-                  readOnly: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Bitiş',
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                  ),
-                  onTap: () => _pickDate(_sonCtrl),
-                ),
-              ),
-              SizedBox(
-                width: 170,
-                child:               DropdownButtonFormField<String>(
-                  initialValue: _durum,
-                  decoration: const InputDecoration(
-                    labelText: 'Durum',
-                    isDense: true,
-                    border: OutlineInputBorder(),
-                  ),
-                  items: [
-                    const DropdownMenuItem(value: null, child: Text('Tümü')),
-                    for (final d in EvrakDurum.all)
-                      DropdownMenuItem(value: d, child: Text(d)),
-                  ],
-                  onChanged: (v) {
-                    setState(() => _durum = v);
-                    _page = 1;
-                    _search();
-                  },
-                ),
-              ),
-              IconButton.outlined(
-                onPressed: _clear,
-                icon: const Icon(Icons.clear),
-                tooltip: 'Temizle',
-              ),
-            ],
+            ),
           ),
           const SizedBox(height: 12),
           Expanded(
@@ -319,6 +265,21 @@ class _EvrakAraPageState extends State<EvrakAraPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _filterField(TextEditingController ctrl, String label, IconData icon,
+      {bool readOnly = false, VoidCallback? onTap}) {
+    return TextField(
+      controller: ctrl,
+      readOnly: readOnly,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, size: 20),
+        isDense: true,
+        border: const OutlineInputBorder(),
+      ),
+      onTap: onTap,
     );
   }
 }
