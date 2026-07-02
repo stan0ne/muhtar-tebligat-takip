@@ -1303,7 +1303,7 @@ class _AyarlarPageState extends State<AyarlarPage> {
               dense: true,
               leading: const Icon(Icons.person),
               title: const Text('Geliştirici'),
-              subtitle: const Text('Savaş Böyük'),
+              subtitle: const Text('Savaş Bölük'),
             ),
           ],
         ),
@@ -1367,10 +1367,7 @@ class _AyarlarPageState extends State<AyarlarPage> {
   Future<void> _showChangelogDialog() async {
     String content = 'Değişiklik kaydı okunamadı.';
     try {
-      final file = File('CHANGELOG.md');
-      if (await file.exists()) {
-        content = await file.readAsString();
-      }
+      content = await DefaultAssetBundle.of(context).loadString('CHANGELOG.md');
     } catch (_) {}
     if (!mounted) return;
     showDialog(

@@ -3,6 +3,13 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.11] — 2026-07-02
+
+### Düzeltildi
+- **Değişiklik Kayıtları dialogu düzeltildi**: CHANGELOG.md artık asset olarak paketleniyor ve `rootBundle` ile okunuyor.
+
+---
+
 ## [1.5.10] — 2026-07-02
 
 ### Değişti
