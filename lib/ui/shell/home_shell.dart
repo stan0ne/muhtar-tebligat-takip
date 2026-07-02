@@ -82,8 +82,7 @@ class _HomeShellState extends State<HomeShell> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Column(
                   children: [
-                    Icon(Icons.mark_email_unread,
-                        size: 32, color: theme.colorScheme.primary),
+                    Image.asset('assets/icon.png', width: 32, height: 32),
                     const SizedBox(height: 4),
                     Text('Tebligat',
                         style: theme.textTheme.titleSmall

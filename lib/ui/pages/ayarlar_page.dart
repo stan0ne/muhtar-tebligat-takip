@@ -1200,25 +1200,6 @@ class _AyarlarPageState extends State<AyarlarPage> {
           ),
           const SizedBox(height: 16),
           const SizedBox(height: 24),
-          // --- Hakkında ---
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: const Text('Hakkında'),
-              subtitle: const Text('Uygulama bilgileri'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => showAboutDialog(
-                context: context,
-                applicationName: 'Muhtarlık Tebligat Takip',
-                applicationVersion: AppConstants.appVersion,
-                applicationIcon: const Icon(Icons.balance, size: 48),
-                children: const [
-                  Text('Muhtarlık tebligat takip sistemi.'),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
           // --- Yardım ---
           Card(
             child: ListTile(
@@ -1226,26 +1207,29 @@ class _AyarlarPageState extends State<AyarlarPage> {
               title: const Text('Yardım'),
               subtitle: const Text('Kullanım kılavuzu ve destek'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Yardım sayfası yakında eklenecek.')),
-                );
-              },
+              onTap: () => _showHelpDialog(),
             ),
           ),
           const SizedBox(height: 8),
-          // --- Changelog ---
+          // --- Değişiklik Kayıtları ---
           Card(
             child: ListTile(
               leading: const Icon(Icons.list_alt),
-              title: const Text('Changelog'),
-              subtitle: const Text('Değişiklik kayıtları'),
+              title: const Text('Değişiklik Kayıtları'),
+              subtitle: const Text('Sürüm geçmişi ve değişiklikler'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Changelog sayfası yakında eklenecek.')),
-                );
-              },
+              onTap: () => _showChangelogDialog(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // --- Hakkında ---
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Hakkında'),
+              subtitle: const Text('Uygulama bilgileri'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _showAboutDialog(),
             ),
           ),
           const SizedBox(height: 8),
@@ -1269,6 +1253,144 @@ class _AyarlarPageState extends State<AyarlarPage> {
           ),
           Expanded(
             child: Text(value, style: const TextStyle(fontSize: 13)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAboutDialog() {
+    final theme = Theme.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/icon_large.png', width: 64, height: 64),
+            const SizedBox(height: 12),
+            Text(
+              'Muhtarlık Tebligat Takip',
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Sürüm ${AppConstants.appVersion}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Muhtarlıklar için tebligat süreçlerini yöneten, '
+              'evrak takibi yapan ve raporlama sağlayan masaüstü uygulaması.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 8),
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.code),
+              title: const Text('Kaynak Kodu'),
+              subtitle: const Text('GitHub'),
+              onTap: () {
+                Process.run('cmd', ['/c', 'start', 'https://github.com/stan0ne/muhtar-tebligat-takip']);
+              },
+            ),
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.person),
+              title: const Text('Geliştirici'),
+              subtitle: const Text('Savaş Böyük'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Kapat'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showHelpDialog() {
+    final theme = Theme.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Yardım'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _helpSection('Ana Sayfa', 'Tüm tebligatların özetini ve istatistiklerini görüntüleyin. Bekleyen, teslim edilen ve arşivlenen evrak sayılarını takip edin.'),
+              _helpSection('Yeni Evrak Kaydı', 'Yeni bir tebligat kaydı oluşturun. Muhtarlık bilgileri, evrak detayları ve teslim bilgilerini girin.'),
+              _helpSection('Evrak Ara', 'Kayıtlı evrakları ad, evrak numarası veya kuruma göre arayın. Filtreleme ve sıralama yapın.'),
+              _helpSection('Bekleyen Evraklar', 'Teslim edilmemiş tüm tebligatları listeleyin. Toplu teslim işlemi yapabilirsiniz.'),
+              _helpSection('Teslim Edilenler', 'Teslim edilmiş tebligatların listesini görüntüleyin.'),
+              _helpSection('Arşivlenenler', 'Arşivlenmiş tebligatların listesini görüntüleyin.'),
+              _helpSection('Raporlar', 'İstatistiksel raporlar oluşturun ve verilerinizi dışa aktarın.'),
+              _helpSection('Ayarlar', 'Uygulama ayarlarını düzenleyin: görünüm, muhtarlık bilgileri, yedekleme, veritabanı yönetimi ve log temizleme.'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Kapat'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _helpSection(String title, String description) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 2),
+          Text(description, style: const TextStyle(fontSize: 12, height: 1.4)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showChangelogDialog() async {
+    String content = 'Değişiklik kaydı okunamadı.';
+    try {
+      final file = File('CHANGELOG.md');
+      if (await file.exists()) {
+        content = await file.readAsString();
+      }
+    } catch (_) {}
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Değişiklik Kayıtları'),
+        content: SizedBox(
+          width: 500,
+          height: 400,
+          child: SingleChildScrollView(
+            child: SelectableText(
+              content,
+              style: const TextStyle(fontSize: 12, fontFamily: 'monospace', height: 1.5),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Kapat'),
           ),
         ],
       ),

@@ -3,6 +3,24 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.10] — 2026-07-02
+
+### Değişti
+- **Uygulama ikonu güncellendi**: Sidebar ve Hakkında bölümlerinde varsayılan Flutter ikonu yerine özel uygulama ikonu kullanılmaya başlandı.
+- İkon dosyaları `assets/` klasörüne taşındı.
+
+---
+
+## [1.5.9] — 2026-07-02
+
+### Değişti
+- **Hakkında bölümü yeniden yapılandırıldı**: Sidebar ikonu, tam sürüm bilgisi, GitHub linki ve uygulama açıklaması eklendi.
+- **Yardım bölümü eklendi**: Tüm sayfalar için kullanım bilgileri içeren yardım dialogu.
+- **Değişiklik Kayıtları bölümü eklendi**: CHANGELOG.md içeriğini gösteren dialog.
+- **Sıralama güncellendi**: Yardım → Değişiklik Kayıtları → Hakkında
+
+---
+
 ## [1.5.8] — 2026-07-02
 
 ### Değişti
