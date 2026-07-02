@@ -279,7 +279,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             width: teslimOran,
                             child: Text(DateUtil.displayDate(e.teslimTarihi), style: TextStyle(fontSize: 12 * scale)),
                           ),
-                          SizedBox(width: durumOran, child: UiUtil.durumChip(context, e.durum)),
+                          UiUtil.durumChip(context, e.durum),
                         ],
                       ),
                     ),

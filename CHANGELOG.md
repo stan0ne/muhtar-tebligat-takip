@@ -3,6 +3,13 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.13] — 2026-07-02
+
+### Düzeltildi
+- **Durum chip boyutu**: Son Gelen Evraklar tablosundaki durum etiketi artık sütuna genişlemiyor, sadece yazının boyutu kadar yer kaplıyor.
+
+---
+
 ## [1.5.12] — 2026-07-02
 
 ### Eklendi
