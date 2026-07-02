@@ -3,7 +3,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'Muhtarlık Tebligat Takip Sistemi';
-  static const String appVersion = '1.5.14';
+  static const String appVersion = '1.6.2';
 
   /// Veritabanı dosya adı.
   static const String dbName = 'tebligat.db';

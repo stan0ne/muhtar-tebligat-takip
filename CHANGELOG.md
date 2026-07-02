@@ -3,7 +3,7 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
-## [1.5.14] — 2026-07-02
+## [1.6.2] — 2026-07-02
 
 ### Eklendi
 - **Teslim Geri Al**: Yanlışlıkla teslim edilen evraklar artık geri alınabilir. "Teslimi Geri Al" butonu ile evrak "Bekliyor" durumuna döner ve teslim kayıtları silinir.
@@ -13,14 +13,14 @@ Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
 ---
 
-## [1.5.13] — 2026-07-02
+## [1.6.1] — 2026-07-02
 
 ### Düzeltildi
 - **Durum chip boyutu**: Son Gelen Evraklar tablosundaki durum etiketi artık sütuna genişlemiyor, sadece yazının boyutu kadar yer kaplıyor.
 
 ---
 
-## [1.5.12] — 2026-07-02
+## [1.6.0] — 2026-07-02
 
 ### Eklendi
 - **Son Gelen Evraklar**: Ana sayfaya son 7 günde gelen evrakları gösteren tablo eklendi.
