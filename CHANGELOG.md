@@ -3,6 +3,15 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.6.4] — 2026-07-02
+
+### Değiştirildi
+- **Rapor Tipi "Aralık" -> "Diğer"**: İsim değiştirildi, günlük/haftalık/aylık/yıllık seçildiğinde otomatik hesaplama yapılır.
+- **Otomatik Hesaplama**: Günlük, Haftalık, Aylık, Yıllık seçildiğinde tarih aralığı otomatik belirlenip rapor hemen hesaplanır.
+- **Diğer modu**: Sadece "Diğer" seçiliyken tarih seçiciler ve "Hesapla" butonu görünür; kullanıcı tarih girip Hesapla'ya basar.
+
+---
+
 ## [1.6.3] — 2026-07-02
 
 ### Eklendi

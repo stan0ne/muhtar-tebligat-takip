@@ -9,7 +9,7 @@ import '../../services/log_service.dart';
 import '../widgets/ui_util.dart';
 import 'evrak_detail_page.dart';
 
-enum RaporTip { gunluk, haftalik, aylik, yillik, aralik }
+enum RaporTip { gunluk, haftalik, aylik, yillik, diger }
 
 /// Raporlar ekranı: filtreler + sayımlar + Excel/PDF çıktı.
 class RaporlarPage extends StatefulWidget {
@@ -40,22 +40,26 @@ class _RaporlarPageState extends State<RaporlarPage> {
       case RaporTip.gunluk:
         _bas = DateTime(now.year, now.month, now.day);
         _son = now;
+        _load();
         break;
       case RaporTip.haftalik:
-        // Bu pazartesiden bugüne
         final weekday = now.weekday;
         _bas = DateTime(now.year, now.month, now.day - (weekday - 1));
         _son = now;
+        _load();
         break;
       case RaporTip.aylik:
         _bas = DateTime(now.year, now.month, 1);
         _son = now;
+        _load();
         break;
       case RaporTip.yillik:
         _bas = DateTime(now.year, 1, 1);
         _son = now;
+        _load();
         break;
-      case RaporTip.aralik:
+      case RaporTip.diger:
+        // Kullanıcı tarih seçecek, hesapla butonuna basacak
         break;
     }
   }
@@ -86,7 +90,7 @@ class _RaporlarPageState extends State<RaporlarPage> {
     if (p != null) {
       setState(() {
         _bas = p;
-        _tip = RaporTip.aralik;
+        _tip = RaporTip.diger;
       });
     }
   }
@@ -102,7 +106,7 @@ class _RaporlarPageState extends State<RaporlarPage> {
     if (p != null) {
       setState(() {
         _son = p;
-        _tip = RaporTip.aralik;
+        _tip = RaporTip.diger;
       });
     }
   }
@@ -243,46 +247,60 @@ class _RaporlarPageState extends State<RaporlarPage> {
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Text('Raporlar',
-                  style: Theme.of(context).textTheme.titleLarge),
-              const Spacer(),
-              SegmentedButton<RaporTip>(
-                segments: const [
-                  ButtonSegment(value: RaporTip.gunluk, label: Text('Günlük')),
-                  ButtonSegment(value: RaporTip.haftalik, label: Text('Haftalık')),
-                  ButtonSegment(value: RaporTip.aylik, label: Text('Aylık')),
-                  ButtonSegment(value: RaporTip.yillik, label: Text('Yıllık')),
-                  ButtonSegment(value: RaporTip.aralik, label: Text('Aralık')),
+children: [
+              Row(
+                children: [
+                  Text('Raporlar',
+                      style: Theme.of(context).textTheme.titleLarge),
+                  const Spacer(),
+                  SegmentedButton<RaporTip>(
+                    segments: const [
+                      ButtonSegment(value: RaporTip.gunluk, label: Text('Günlük')),
+                      ButtonSegment(value: RaporTip.haftalik, label: Text('Haftalık')),
+                      ButtonSegment(value: RaporTip.aylik, label: Text('Aylık')),
+                      ButtonSegment(value: RaporTip.yillik, label: Text('Yıllık')),
+                      ButtonSegment(value: RaporTip.diger, label: Text('Diğer')),
+                    ],
+                    selected: {_tip},
+                    onSelectionChanged: (s) {
+                      setState(() => _tip = s.first);
+                      if (_tip != RaporTip.diger) _applyTip();
+                    },
+                  ),
                 ],
-                selected: {_tip},
-                onSelectionChanged: (s) {
-                  setState(() => _tip = s.first);
-                  if (_tip != RaporTip.aralik) _applyTip();
-                },
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Text('Başlangıç: ${DateUtil.displayDate(DateFormat('yyyy-MM-dd').format(_bas))}'),
-              IconButton(
-                  onPressed: _pickBas, icon: const Icon(Icons.event)),
-              const SizedBox(width: 16),
-              Text('Bitiş: ${DateUtil.displayDate(DateFormat('yyyy-MM-dd').format(_son))}'),
-              IconButton(
-                  onPressed: _pickSon, icon: const Icon(Icons.event)),
-              const Spacer(),
-              FilledButton.icon(
-                onPressed: _loading ? null : _load,
-                icon: const Icon(Icons.calculate),
-                label: const Text('Hesapla'),
-              ),
-            ],
-          ),
+              if (_tip == RaporTip.diger) ...[
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Text('Başlangıç: ${DateUtil.displayDate(DateFormat('yyyy-MM-dd').format(_bas))}'),
+                    IconButton(
+                        onPressed: _pickBas, icon: const Icon(Icons.event)),
+                    const SizedBox(width: 16),
+                    Text('Bitiş: ${DateUtil.displayDate(DateFormat('yyyy-MM-dd').format(_son))}'),
+                    IconButton(
+                        onPressed: _pickSon, icon: const Icon(Icons.event)),
+                    const Spacer(),
+                    FilledButton.icon(
+                      onPressed: _loading ? null : _load,
+                      icon: const Icon(Icons.calculate),
+                      label: const Text('Hesapla'),
+                    ),
+                  ],
+                ),
+              ] else ...[
+                const SizedBox(height: 12),
+                Text(
+                  'Aralık: ${DateUtil.displayDate(DateFormat('yyyy-MM-dd').format(_bas))} - ${DateUtil.displayDate(DateFormat('yyyy-MM-dd').format(_son))}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 8),
+                FilledButton.icon(
+                  onPressed: _loading ? null : _load,
+                  icon: const Icon(Icons.calculate),
+                  label: const Text('Hesapla / Yenile'),
+                ),
+              ],
           const SizedBox(height: 16),
           if (_loading)
             const Center(child: CircularProgressIndicator())
