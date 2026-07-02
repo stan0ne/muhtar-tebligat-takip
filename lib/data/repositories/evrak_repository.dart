@@ -493,7 +493,7 @@ class EvrakRepository extends BaseRepository {
   }
 
   /// Son N günde gelen evrakları getir (Dashboard için).
-  Future<List<Evrak>> getRecentDocuments({int days = 7, int limit = 15}) async {
+  Future<List<Evrak>> getRecentDocuments({int days = 7, int limit = 50}) async {
     final database = await db;
     final now = DateTime.now();
     final threshold = now.subtract(Duration(days: days));
@@ -502,6 +502,31 @@ class EvrakRepository extends BaseRepository {
       _table,
       where: 'silindi_mi = 0 AND gelis_tarihi >= ?',
       whereArgs: [thresholdStr],
+      orderBy: 'gelis_tarihi DESC, id DESC',
+      limit: limit,
+    );
+    return rows.map(Evrak.fromMap).toList();
+  }
+
+  /// Belirli bir tarihten önceki son N günde gelen evrakları getir (infinite scroll için).
+  Future<List<Evrak>> getRecentDocumentsOlderThan({int days = 7, String? beforeDate, int limit = 50}) async {
+    final database = await db;
+    final now = DateTime.now();
+    final threshold = now.subtract(Duration(days: days));
+    final thresholdStr = threshold.toIso8601String().substring(0, 10);
+    
+    String where = 'silindi_mi = 0 AND gelis_tarihi >= ?';
+    List<dynamic> args = [thresholdStr];
+    
+    if (beforeDate != null && beforeDate.isNotEmpty) {
+      where += ' AND gelis_tarihi < ?';
+      args.add(beforeDate);
+    }
+    
+    final rows = await database.query(
+      _table,
+      where: where,
+      whereArgs: args,
       orderBy: 'gelis_tarihi DESC, id DESC',
       limit: limit,
     );

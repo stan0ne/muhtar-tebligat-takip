@@ -24,18 +24,35 @@ class _DashboardPageState extends State<DashboardPage> {
   bool _loading = true;
   String _muhtarlikAdi = '';
   List<Evrak> _recentDocuments = [];
+  bool _hasMore = true;
+  bool _loadingMore = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _load();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      _loadMore();
+    }
   }
 
   Future<void> _load() async {
     final counts = await Services.evrak.durumCounts();
     final total = await Services.evrak.totalCount();
     final muhtarlikAdi = await Services.settings.get('muhtarlik_adi') ?? '';
-    final recent = await Services.evrak.getRecentDocuments(days: 7, limit: 15);
+    final recent = await Services.evrak.getRecentDocuments(days: 7, limit: 50);
     if (!mounted) return;
     setState(() {
       _bekleyen = counts[EvrakDurum.bekliyor] ?? 0;
@@ -44,6 +61,7 @@ class _DashboardPageState extends State<DashboardPage> {
       _toplam = total;
       _muhtarlikAdi = muhtarlikAdi;
       _recentDocuments = recent;
+      _hasMore = recent.length >= 50;
       _loading = false;
     });
 
@@ -61,7 +79,7 @@ class _DashboardPageState extends State<DashboardPage> {
         // Sayıları yenile
         final newCounts = await Services.evrak.durumCounts();
         final newTotal = await Services.evrak.totalCount();
-        final newRecent = await Services.evrak.getRecentDocuments(days: 7, limit: 15);
+        final newRecent = await Services.evrak.getRecentDocuments(days: 7, limit: 50);
         if (mounted) setState(() {
           _bekleyen = newCounts[EvrakDurum.bekliyor] ?? 0;
           _teslim = newCounts[EvrakDurum.teslimEdildi] ?? 0;
@@ -70,6 +88,27 @@ class _DashboardPageState extends State<DashboardPage> {
           _recentDocuments = newRecent;
         });
       }
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_loadingMore || !_hasMore) return;
+    setState(() => _loadingMore = true);
+    
+    // Mevcut son kaydın geliş tarihinden eski olanları yükle
+    final lastDate = _recentDocuments.last.gelisTarihi;
+    final more = await Services.evrak.getRecentDocumentsOlderThan(
+      days: 7, 
+      beforeDate: lastDate, 
+      limit: 50,
+    );
+    
+    if (mounted) {
+      setState(() {
+        _recentDocuments.addAll(more);
+        _hasMore = more.length >= 50;
+        _loadingMore = false;
+      });
     }
   }
 
@@ -234,8 +273,16 @@ class _DashboardPageState extends State<DashboardPage> {
             // Rows
             Expanded(
               child: ListView.builder(
-                itemCount: _recentDocuments.length,
+                controller: _scrollController,
+                itemCount: _recentDocuments.length + (_hasMore ? 1 : 0),
                 itemBuilder: (context, index) {
+                  if (index == _recentDocuments.length) {
+                    // Loading indicator at the bottom
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
                   final e = _recentDocuments[index];
                   final bgColor = isLight
                       ? (index.isOdd ? const Color(0xFFF5F7FA) : Colors.transparent)
