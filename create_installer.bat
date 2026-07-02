@@ -20,14 +20,14 @@ if %errorlevel% neq 0 (
     echo UYARI: MSIX olusturma basarisiz!
 ) else (
     echo MSIX basariyla olusturuldu!
-    copy "build\windows\x64\runner\Release\muhtar_tebligat_takip.msix" "installer\muhtar_tebligat_takip_1.5.5.msix" >nul 2>nul
+    copy "build\windows\x64\runner\Release\muhtar_tebligat_takip.msix" "installer\muhtar_tebligat_takip_1.5.6.msix" >nul 2>nul
 )
 echo.
 
 echo [3/5] MSI (WiX) derleniyor...
 where wix >nul 2>nul
 if %errorlevel% equ 0 (
-    wix build -o "installer\muhtar_tebligat_takip_setup_1.5.5.msi" -b "%~dp0" -pdb "none" -ext WixToolset.UI.wixext installer.wxs
+    wix build -o "installer\muhtar_tebligat_takip_setup_1.5.6.msi" -b "%~dp0" -pdb "none" -ext WixToolset.UI.wixext installer.wxs
     if %errorlevel% neq 0 (
         echo UYARI: WiX MSI derlemesi basarisiz!
     ) else (
@@ -49,7 +49,7 @@ if %errorlevel% equ 0 (
         echo UYARI: Inno Setup bulunamadi! EXE olusturulamadi.
     )
 )
-if exist "installer\muhtar_tebligat_takip_setup_1.5.5.exe" (
+if exist "installer\muhtar_tebligat_takip_setup_1.5.6.exe" (
     echo EXE basariyla olusturuldu!
 ) else (
     echo UYARI: EXE olusturulamadi!
@@ -59,14 +59,14 @@ echo.
 echo [5/5] Tamamlandi!
 echo.
 echo Olusturulan dosyalar:
-if exist "installer\muhtar_tebligat_takip_1.5.5.msix" (
-    echo   MSIX: installer\muhtar_tebligat_takip_1.5.5.msix
+if exist "installer\muhtar_tebligat_takip_1.5.6.msix" (
+    echo   MSIX: installer\muhtar_tebligat_takip_1.5.6.msix
 )
-if exist "installer\muhtar_tebligat_takip_setup_1.5.5.msi" (
-    echo   MSI:  installer\muhtar_tebligat_takip_setup_1.5.5.msi
+if exist "installer\muhtar_tebligat_takip_setup_1.5.6.msi" (
+    echo   MSI:  installer\muhtar_tebligat_takip_setup_1.5.6.msi
 )
-if exist "installer\muhtar_tebligat_takip_setup_1.5.5.exe" (
-    echo   EXE:  installer\muhtar_tebligat_takip_setup_1.5.5.exe
+if exist "installer\muhtar_tebligat_takip_setup_1.5.6.exe" (
+    echo   EXE:  installer\muhtar_tebligat_takip_setup_1.5.6.exe
 )
 echo.
 pause

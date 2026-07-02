@@ -10,7 +10,6 @@ import '../../services/log_service.dart';
 import '../providers/app_provider.dart';
 import '../pages/evrak_detail_page.dart';
 import '../pages/ice_aktarma_page.dart';
-import '../pages/yedekleme_page.dart';
 import 'widgets/log_viewer_dialog.dart';
 
 /// Ayarlar: tema, muhtarlık bilgileri, loglar, veritabanı bilgisi.
@@ -48,6 +47,13 @@ class _AyarlarPageState extends State<AyarlarPage> {
   String _dbPath = '';
   int _dbSize = 0;
 
+  // Yedekleme
+  List<File> _backups = [];
+  List<File> _externalBackups = [];
+  bool _backupLoading = false;
+  String? _externalPath;
+  bool _savingExternal = false;
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +61,7 @@ class _AyarlarPageState extends State<AyarlarPage> {
     _loadLogStats();
     _loadAutoArchiveSettings();
     _loadDbInfo();
+    _loadBackups();
   }
 
   @override
@@ -417,6 +424,134 @@ class _AyarlarPageState extends State<AyarlarPage> {
     }
   }
 
+  // --- Yedekleme ---
+
+  Future<void> _loadBackups() async {
+    setState(() => _backupLoading = true);
+    try {
+      final files = await Services.backup.listBackups();
+      final extPath = await Services.backup.getExternalPath();
+      final extFiles = await Services.backup.listExternalBackups();
+      if (mounted) {
+        setState(() {
+          _backups = files;
+          _externalPath = extPath;
+          _externalBackups = extFiles;
+        });
+      }
+    } catch (_) {}
+    if (mounted) setState(() => _backupLoading = false);
+  }
+
+  Future<void> _backupNow() async {
+    try {
+      final file = await Services.backup.backup();
+      await Services.settings.set(AppConstants.prefLastBackup, DateTime.now().toIso8601String().substring(0, 10));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Yedek alındı: ${p.basename(file.path)}')),
+        );
+      }
+      _loadBackups();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _backupToExternal() async {
+    if (_externalPath == null || _externalPath!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Önce harici yedekleme konumunu seçin.')),
+      );
+      return;
+    }
+    try {
+      final file = await Services.backup.backupToExternal();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Harici yedek alındı: ${p.basename(file.path)}')),
+        );
+      }
+      _loadBackups();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _selectExternalDir() async {
+    final result = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: 'Harici Yedekleme Konumu Seçin',
+    );
+    if (result != null && result.isNotEmpty) {
+      setState(() => _savingExternal = true);
+      await Services.backup.setExternalPath(result);
+      setState(() {
+        _externalPath = result;
+        _savingExternal = false;
+      });
+      _loadBackups();
+    }
+  }
+
+  Future<void> _restoreBackup(File file) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Geri Yükle'),
+        content: Text('Seçili yedek geri yüklenecek. Mevcut veriler üzerine yazılacak.\n\n${p.basename(file.path)}'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Vazgeç')),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Geri Yükle')),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    try {
+      await Services.backup.restore(file.path);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Geri yükleme tamamlandı.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Hata: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteBackup(File file) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Yedeği Sil'),
+        content: Text(p.basename(file.path)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Vazgeç')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Sil'),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      await Services.backup.deleteBackup(file);
+      _loadBackups();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppProvider>();
@@ -544,7 +679,173 @@ class _AyarlarPageState extends State<AyarlarPage> {
             ),
           ),
           const SizedBox(height: 16),
-          // --- Veritabanı Bilgisi ---
+          // --- Yedekleme ---
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.backup, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text('Yedekleme', style: theme.textTheme.titleMedium),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      FilledButton.icon(
+                        onPressed: _backupNow,
+                        icon: const Icon(Icons.backup, size: 18),
+                        label: const Text('Şimdi Yedek Al'),
+                      ),
+                      const SizedBox(width: 12),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          final res = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['db'],
+                          );
+                          if (res != null && res.paths.isNotEmpty) {
+                            await _restoreBackup(File(res.paths.first!));
+                          }
+                        },
+                        icon: const Icon(Icons.restore, size: 18),
+                        label: const Text('Dosyadan Geri Yükle'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Otomatik Günlük Yedek'),
+                    subtitle: const Text('Girişte, bugün alınmamışsa otomatik yedek alınır.'),
+                    value: app.autoBackup,
+                    onChanged: (v) => app.setAutoBackup(v),
+                  ),
+                  const Divider(height: 1),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          readOnly: true,
+                          controller: TextEditingController(text: _externalPath ?? ''),
+                          decoration: InputDecoration(
+                            labelText: 'Harici Yedekleme Konumu',
+                            hintText: 'Dizin seçilmedi',
+                            border: const OutlineInputBorder(),
+                            isDense: true,
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.folder_open),
+                              onPressed: _selectExternalDir,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: _savingExternal ? null : _backupToExternal,
+                        icon: _savingExternal
+                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Icon(Icons.backup, size: 18),
+                        label: const Text('Yedekle'),
+                      ),
+                    ],
+                  ),
+                  if (_externalBackups.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text('Harici Yedekler (${_externalBackups.length})',
+                        style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _externalBackups.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (_, i) {
+                        final f = _externalBackups[i];
+                        final stat = f.statSync();
+                        return ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.storage, color: Colors.green, size: 18),
+                          title: Text(p.basename(f.path), style: const TextStyle(fontSize: 12)),
+                          subtitle: Text('${stat.size ~/ 1024} KB', style: const TextStyle(fontSize: 11)),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                tooltip: 'Geri Yükle',
+                                icon: const Icon(Icons.restore, size: 16),
+                                onPressed: () => _restoreBackup(f),
+                              ),
+                              IconButton(
+                                tooltip: 'Sil',
+                                icon: const Icon(Icons.delete, color: Colors.red, size: 16),
+                                onPressed: () => _deleteBackup(f),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                  if (_backups.isNotEmpty) ...[
+                    const Divider(height: 1),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Text('Mevcut Yedekler (${_backups.length})',
+                            style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.refresh, size: 18),
+                          onPressed: _loadBackups,
+                          tooltip: 'Yenile',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _backups.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (_, i) {
+                        final f = _backups[i];
+                        final stat = f.statSync();
+                        return ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.storage, color: Colors.blueGrey, size: 18),
+                          title: Text(p.basename(f.path), style: const TextStyle(fontSize: 12)),
+                          subtitle: Text('${stat.size ~/ 1024} KB', style: const TextStyle(fontSize: 11)),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                tooltip: 'Geri Yükle',
+                                icon: const Icon(Icons.restore, size: 16),
+                                onPressed: () => _restoreBackup(f),
+                              ),
+                              IconButton(
+                                tooltip: 'Sil',
+                                icon: const Icon(Icons.delete, color: Colors.red, size: 16),
+                                onPressed: () => _deleteBackup(f),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // --- Veritabanı ---
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -898,21 +1199,6 @@ class _AyarlarPageState extends State<AyarlarPage> {
             ),
           ),
           const SizedBox(height: 16),
-          // --- Yedekleme ---
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.backup),
-              title: const Text('Yedekleme'),
-              subtitle: const Text('Dahili ve harici yedekleme ayarları.'),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const YedeklemePage()),
-                );
-              },
-            ),
-          ),
           const SizedBox(height: 24),
           Center(
             child: Text(

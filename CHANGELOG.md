@@ -3,6 +3,14 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.6] — 2026-07-02
+
+### Değişti
+- **Yedekleme içeriği gömüldü**: Yedekleme artık ayrı bir sayfa değil, Ayarlar içinde doğrudan çalışan bir kart olarak Veritabanı bölümünün üstüne konumlandırıldı.
+- Yedekleme içindeki tüm işlemler (yedek alma, geri yükleme, harici yedekleme, yedek listesi) artık Ayarlar sayfasından yapılabiliyor.
+
+---
+
 ## [1.5.5] — 2026-07-02
 
 ### Değişti
