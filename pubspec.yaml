@@ -2,7 +2,7 @@ name: muhtar_tebligat_takip
 description: "Muhtarlık Tebligat Takip Sistemi"
 publish_to: 'none'
 
-version: 1.6.4+23
+version: 1.6.5+24
 
 environment:
   sdk: ^3.11.3

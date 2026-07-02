@@ -3,6 +3,13 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.6.5] — 2026-07-02
+
+### Değiştirildi
+- **Raporlar sayfası UI iyileştirmesi**: Günlük, Haftalık, Aylık, Yıllık seçildiğinde hesapla/yenile butonu gizlendi, tarih aralığı sadece bilgi olarak gösterilir. Sadece "Diğer" seçiliyken tarih seçiciler ve "Hesapla" butonu görünür.
+
+---
+
 ## [1.6.4] — 2026-07-02
 
 ### Değiştirildi

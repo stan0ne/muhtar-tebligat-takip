@@ -294,12 +294,6 @@ children: [
                   'Aralık: ${DateUtil.displayDate(DateFormat('yyyy-MM-dd').format(_bas))} - ${DateUtil.displayDate(DateFormat('yyyy-MM-dd').format(_son))}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
-                const SizedBox(height: 8),
-                FilledButton.icon(
-                  onPressed: _loading ? null : _load,
-                  icon: const Icon(Icons.calculate),
-                  label: const Text('Hesapla / Yenile'),
-                ),
               ],
           const SizedBox(height: 16),
           if (_loading)
