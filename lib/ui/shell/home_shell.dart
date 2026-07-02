@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/constants.dart';
+import '../../services/log_service.dart';
 import '../pages/dashboard_page.dart';
 import '../pages/evrak_form_page.dart';
 import '../pages/evrak_ara_page.dart';
@@ -20,6 +22,18 @@ class _HomeShellState extends State<HomeShell> {
   final _hizliAraCtrl = TextEditingController();
   int _araKey = 0;
   String _hizliAramaDeger = '';
+  String _muhtarlikAdi = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMuhtarlikAdi();
+  }
+
+  Future<void> _loadMuhtarlikAdi() async {
+    final adi = await Services.settings.get('muhtarlik_adi') ?? '';
+    if (mounted) setState(() => _muhtarlikAdi = adi);
+  }
 
   @override
   void dispose() {
@@ -66,6 +80,7 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final version = AppConstants.appVersion;
 
     return Scaffold(
       body: Row(
@@ -75,6 +90,7 @@ class _HomeShellState extends State<HomeShell> {
           // odaklanmaları garanti altına alınır.
           FocusTraversalGroup(
             child: NavigationRail(
+              trailingAtBottom: true,
               selectedIndex: _selected.index,
               onDestinationSelected: (i) => _goTo(MenuPage.values[i]),
               extended: MediaQuery.of(context).size.width > 1100,
@@ -98,6 +114,13 @@ class _HomeShellState extends State<HomeShell> {
                     label: Text(p.title),
                   ),
               ],
+              trailing: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text('v${AppConstants.appVersion}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.35),
+                    )),
+              ),
             ),
           ),
           const VerticalDivider(width: 1),

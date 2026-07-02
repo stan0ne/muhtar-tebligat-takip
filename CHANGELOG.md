@@ -3,6 +3,13 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.6.6] — 2026-07-02
+
+### Eklendi
+- **Sidebar sürüm numarası**: Sol menü (NavigationRail) en altına uygulama sürüm numarası eklendi (`trailingAtBottom: true` ile sabitlendi, sidebar ile renk uyumu sağlandı).
+
+---
+
 ## [1.6.5] — 2026-07-02
 
 ### Değiştirildi
