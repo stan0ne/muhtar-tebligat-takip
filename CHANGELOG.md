@@ -3,6 +3,15 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.12] — 2026-07-02
+
+### Eklendi
+- **Son Gelen Evraklar**: Ana sayfaya son 7 günde gelen evrakları gösteren tablo eklendi.
+- Tabloda Ad Soyad, Geldiği Kurum, Geliş Tarihi, Teslim Tarihi ve Durum sütunları yer alıyor.
+- Satırlara tıklayarak evrak detay sayfasına gidilebilir.
+
+---
+
 ## [1.5.11] — 2026-07-02
 
 ### Düzeltildi

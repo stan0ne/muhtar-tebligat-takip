@@ -492,6 +492,22 @@ class EvrakRepository extends BaseRepository {
     return rows.map(Evrak.fromMap).toList();
   }
 
+  /// Son N günde gelen evrakları getir (Dashboard için).
+  Future<List<Evrak>> getRecentDocuments({int days = 7, int limit = 15}) async {
+    final database = await db;
+    final now = DateTime.now();
+    final threshold = now.subtract(Duration(days: days));
+    final thresholdStr = threshold.toIso8601String().substring(0, 10);
+    final rows = await database.query(
+      _table,
+      where: 'silindi_mi = 0 AND gelis_tarihi >= ?',
+      whereArgs: [thresholdStr],
+      orderBy: 'gelis_tarihi DESC, id DESC',
+      limit: limit,
+    );
+    return rows.map(Evrak.fromMap).toList();
+  }
+
   /// Bir evrakın teslim kayıtlarını getir (en yeni önce).
   Future<List<TeslimKaydi>> teslimKayitlari(int evrakId) async {
     final database = await db;

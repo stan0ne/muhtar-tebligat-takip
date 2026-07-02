@@ -226,6 +226,9 @@ class EvrakService {
   Future<List<Evrak>> listInRange(String bas, String son) =>
       _repo.listInRange(bas, son);
 
+  Future<List<Evrak>> getRecentDocuments({int days = 7, int limit = 15}) =>
+      _repo.getRecentDocuments(days: days, limit: limit);
+
   Future<List<DurumGecmisi>> durumGecmisi(int evrakId) =>
       _repo.durumGecmisi(evrakId);
 }
