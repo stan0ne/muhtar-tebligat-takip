@@ -3,6 +3,13 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.7] — 2026-07-02
+
+### Değişti
+- **Ayarlar sıralaması güncellendi**: Görünüm → Muhtarlık Bilgileri → Yedekleme → Otomatik Arşivleme → Veritabanı → Log Yönetimi → İşlem Logları
+
+---
+
 ## [1.5.6] — 2026-07-02
 
 ### Değişti
