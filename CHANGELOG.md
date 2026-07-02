@@ -3,6 +3,14 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.6.3] — 2026-07-02
+
+### Eklendi
+- **Haftalık Rapor**: Raporlar sayfasına haftalık rapor seçeneği eklendi (Bu Pazartesi'den bugüne).
+- **Tıklanabilir Rapor Sonuçları**: Toplam, Bekleyen, Teslim Edilen ve Arşivlenen kartlarına tıklanınca o dönemdeki evraklar dialog olarak görüntülenebilir. Evraklara tıklayarak detay sayfasına gidilebilir.
+
+---
+
 ## [1.6.2] — 2026-07-02
 
 ### Eklendi

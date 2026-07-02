@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/constants.dart';
 import '../../core/date_util.dart';
+import '../../data/models/evrak.dart';
+import '../../data/repositories/evrak_repository.dart' show EvrakFilter;
 import '../../services/export_service.dart' show RaporSonuc;
 import '../../services/log_service.dart';
 import '../widgets/ui_util.dart';
+import 'evrak_detail_page.dart';
 
-enum RaporTip { gunluk, aylik, yillik, aralik }
+enum RaporTip { gunluk, haftalik, aylik, yillik, aralik }
 
 /// Raporlar ekranı: filtreler + sayımlar + Excel/PDF çıktı.
 class RaporlarPage extends StatefulWidget {
@@ -36,6 +39,12 @@ class _RaporlarPageState extends State<RaporlarPage> {
     switch (_tip) {
       case RaporTip.gunluk:
         _bas = DateTime(now.year, now.month, now.day);
+        _son = now;
+        break;
+      case RaporTip.haftalik:
+        // Bu pazartesiden bugüne
+        final weekday = now.weekday;
+        _bas = DateTime(now.year, now.month, now.day - (weekday - 1));
         _son = now;
         break;
       case RaporTip.aylik:
@@ -166,6 +175,68 @@ class _RaporlarPageState extends State<RaporlarPage> {
     }
   }
 
+  Future<void> _showFilteredDocs(String? durum) async {
+    final df = DateFormat('yyyy-MM-dd');
+    final bas = df.format(_bas);
+    final son = df.format(_son);
+    
+    List<Evrak> evraklar;
+    if (durum == null) {
+      // Toplam - tümünü getir
+      evraklar = await Services.evrak.listInRange(bas, son);
+    } else {
+      // Belirli durumdakileri filtrele
+      final result = await Services.evrak.search(
+        filter: EvrakFilter(durum: durum, tarihBaslangic: bas, tarihBitis: son),
+        pageSize: 500,
+      );
+      evraklar = result.items;
+    }
+
+    if (!mounted) return;
+    
+    final baslik = durum == null ? 'Toplam Evraklar' : durum;
+    
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('$baslik (${evraklar.length})'),
+        content: SizedBox(
+          width: 500,
+          height: 400,
+          child: evraklar.isEmpty
+              ? const Center(child: Text('Bu dönemde kayıp yok.'))
+              : ListView.separated(
+                  itemCount: evraklar.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (_, i) {
+                    final e = evraklar[i];
+                    return ListTile(
+                      dense: true,
+                      title: Text(e.adSoyad, style: const TextStyle(fontWeight: FontWeight.w500)),
+                      subtitle: Text('${e.geldigiKurum ?? "-"} • ${DateUtil.displayDate(e.gelisTarihi)}'),
+                      trailing: UiUtil.durumChip(context, e.durum),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        showDialog(
+                          context: context,
+                          builder: (_) => EvrakDetailPage(evrakId: e.id!),
+                        );
+                      },
+                    );
+                  },
+                ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Kapat'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -181,6 +252,7 @@ class _RaporlarPageState extends State<RaporlarPage> {
               SegmentedButton<RaporTip>(
                 segments: const [
                   ButtonSegment(value: RaporTip.gunluk, label: Text('Günlük')),
+                  ButtonSegment(value: RaporTip.haftalik, label: Text('Haftalık')),
                   ButtonSegment(value: RaporTip.aylik, label: Text('Aylık')),
                   ButtonSegment(value: RaporTip.yillik, label: Text('Yıllık')),
                   ButtonSegment(value: RaporTip.aralik, label: Text('Aralık')),
@@ -225,14 +297,30 @@ class _RaporlarPageState extends State<RaporlarPage> {
               crossAxisSpacing: 12,
               childAspectRatio: 1.6,
               children: [
-                UiUtil.infoCard(context,
-                    title: 'Toplam', value: _toplam, icon: Icons.summarize, color: Theme.of(context).colorScheme.primary),
-                UiUtil.infoCard(context,
-                    title: 'Bekleyen', value: _counts[EvrakDurum.bekliyor] ?? 0, icon: Icons.hourglass_empty, color: Colors.orange),
-                UiUtil.infoCard(context,
-                    title: 'Teslim Edilen', value: _counts[EvrakDurum.teslimEdildi] ?? 0, icon: Icons.check_circle, color: Colors.green),
-                UiUtil.infoCard(context,
-                    title: 'Arşivlenen', value: _counts[EvrakDurum.arsivlendi] ?? 0, icon: Icons.archive, color: Colors.blueGrey),
+                InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => _showFilteredDocs(null),
+                  child: UiUtil.infoCard(context,
+                      title: 'Toplam', value: _toplam, icon: Icons.summarize, color: Theme.of(context).colorScheme.primary),
+                ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => _showFilteredDocs(EvrakDurum.bekliyor),
+                  child: UiUtil.infoCard(context,
+                      title: 'Bekleyen', value: _counts[EvrakDurum.bekliyor] ?? 0, icon: Icons.hourglass_empty, color: Colors.orange),
+                ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => _showFilteredDocs(EvrakDurum.teslimEdildi),
+                  child: UiUtil.infoCard(context,
+                      title: 'Teslim Edilen', value: _counts[EvrakDurum.teslimEdildi] ?? 0, icon: Icons.check_circle, color: Colors.green),
+                ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => _showFilteredDocs(EvrakDurum.arsivlendi),
+                  child: UiUtil.infoCard(context,
+                      title: 'Arşivlenen', value: _counts[EvrakDurum.arsivlendi] ?? 0, icon: Icons.archive, color: Colors.blueGrey),
+                ),
               ],
             ),
           const SizedBox(height: 20),
