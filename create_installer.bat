@@ -27,12 +27,11 @@ echo.
 echo [3/5] MSI (WiX) derleniyor...
 where wix >nul 2>nul
 if %errorlevel% equ 0 (
-    wix build -o "installer\muhtar_tebligat_takip_setup_1.5.5.msi" -b "%~dp0" -ext WixToolset.UI.wixext installer.wxs
+    wix build -o "installer\muhtar_tebligat_takip_setup_1.5.5.msi" -b "%~dp0" -pdb "none" -ext WixToolset.UI.wixext installer.wxs
     if %errorlevel% neq 0 (
         echo UYARI: WiX MSI derlemesi basarisiz!
     ) else (
         echo MSI basariyla olusturuldu!
-        del /q "installer\*.wixpdb" 2>nul
     )
 ) else (
     echo UYARI: WiX bulunamadi! MSI olusturulamadi.
