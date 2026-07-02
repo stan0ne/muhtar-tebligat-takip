@@ -1200,12 +1200,52 @@ class _AyarlarPageState extends State<AyarlarPage> {
           ),
           const SizedBox(height: 16),
           const SizedBox(height: 24),
-          Center(
-            child: Text(
-              'v${AppConstants.appVersion}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.4),
+          // --- Hakkında ---
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Hakkında'),
+              subtitle: const Text('Uygulama bilgileri'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => showAboutDialog(
+                context: context,
+                applicationName: 'Muhtarlık Tebligat Takip',
+                applicationVersion: AppConstants.appVersion,
+                applicationIcon: const Icon(Icons.balance, size: 48),
+                children: const [
+                  Text('Muhtarlık tebligat takip sistemi.'),
+                ],
               ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // --- Yardım ---
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.help_outline),
+              title: const Text('Yardım'),
+              subtitle: const Text('Kullanım kılavuzu ve destek'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Yardım sayfası yakında eklenecek.')),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+          // --- Changelog ---
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.list_alt),
+              title: const Text('Changelog'),
+              subtitle: const Text('Değişiklik kayıtları'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Changelog sayfası yakında eklenecek.')),
+                );
+              },
             ),
           ),
           const SizedBox(height: 8),
