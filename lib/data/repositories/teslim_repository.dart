@@ -42,4 +42,10 @@ class TeslimRepository extends BaseRepository {
       }
     });
   }
+
+  /// Bir evraka ait tüm teslim kayıtlarını sil.
+  Future<int> deleteForEvrak(int evrakId) async {
+    final database = await db;
+    return await database.delete(_table, where: 'evrak_id = ?', whereArgs: [evrakId]);
+  }
 }

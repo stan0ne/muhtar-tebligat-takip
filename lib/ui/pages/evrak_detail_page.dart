@@ -52,6 +52,28 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
     if (ok == true && mounted) Navigator.of(context).pop(true);
   }
 
+  Future<void> _teslimiGeriAl() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Teslimi Geri Al'),
+        content: const Text('Bu evrakın teslim işlemi geri alınacak. Evrak "Bekliyor" durumuna dönecek ve teslim kayıtları silinecektir.\n\nDevam edilsin mi?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Vazgeç')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.orange),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Geri Al'),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      await Services.evrak.teslimiGeriAl(widget.evrakId);
+      if (mounted) _load();
+    }
+  }
+
   Future<void> _arsivle() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -146,6 +168,7 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
     final theme = Theme.of(context);
     final isBekleyen = e.durum == EvrakDurum.bekliyor;
     final isArsiv = e.durum == EvrakDurum.arsivlendi;
+    final isTeslim = e.durum == EvrakDurum.teslimEdildi;
 
     return Focus(
       autofocus: true,
@@ -231,8 +254,10 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (t.tcKimlikNo != null) Text('TC: ${t.tcKimlikNo}'),
-                                if (t.telefon != null) Text('Tel: ${t.telefon}'),
+                                if (t.tcKimlikNo != null)
+                                  Text('TC: ${t.tcKimlikNo}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                                if (t.telefon != null)
+                                  Text('Tel: ${t.telefon}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                               ],
                             ),
                           );
@@ -282,6 +307,12 @@ class _EvrakDetailPageState extends State<EvrakDetailPage> {
                           onPressed: _geriAl,
                           icon: const Icon(Icons.restore),
                           label: const Text('Bekleyene Geri Al'),
+                        ),
+                      if (isTeslim)
+                        FilledButton.icon(
+                          onPressed: _teslimiGeriAl,
+                          icon: const Icon(Icons.undo),
+                          label: const Text('Teslimi Geri Al'),
                         ),
                       FilledButton.icon(
                         style: FilledButton.styleFrom(backgroundColor: Colors.red),

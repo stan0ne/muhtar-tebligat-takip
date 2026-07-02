@@ -4,6 +4,7 @@ import '../data/models/evrak.dart';
 import '../data/models/teslim_kaydi.dart';
 import '../data/models/durum_gecmisi.dart';
 import '../data/repositories/evrak_repository.dart';
+import '../data/repositories/durum_gecmisi_repository.dart';
 import '../data/repositories/teslim_repository.dart';
 import 'log_service.dart';
 
@@ -95,6 +96,38 @@ class EvrakService {
         hedefTablo: 'Evraklar',
         hedefId: evrakId,
         aciklama: evrak?.adSoyad);
+  }
+
+  /// Teslim geri al -> Bekliyor, teslim tarihi temizle, teslim kaydını sil.
+  Future<void> teslimiGeriAl(int evrakId) async {
+    final evrak = await _repo.getById(evrakId);
+    if (evrak == null) return;
+
+    // Teslim tarihini temizle
+    final updated = evrak.copyWith(
+      durum: EvrakDurum.bekliyor,
+      teslimTarihi: null,
+      guncellemeTarihi: DateTime.now().toIso8601String(),
+    );
+    await _repo.update(updated);
+
+    // Durum değişikliğini kaydet
+    final gecmisRepo = DurumGecmisiRepository();
+    await gecmisRepo.insert(DurumGecmisi(
+      evrakId: evrakId,
+      eskiDurum: EvrakDurum.teslimEdildi,
+      yeniDurum: EvrakDurum.bekliyor,
+      degisiklikTarihi: DateTime.now().toIso8601String(),
+      aciklama: 'Teslim geri alındı',
+    ));
+
+    // Teslim kayıtlarını sil
+    await _teslimRepo.deleteForEvrak(evrakId);
+
+    await Services.log.log(LogIslem.evrakGeriAlma,
+        hedefTablo: 'Evraklar',
+        hedefId: evrakId,
+        aciklama: '${evrak.adSoyad} - Teslim geri alındı');
   }
 
   /// Toplu arşivle.

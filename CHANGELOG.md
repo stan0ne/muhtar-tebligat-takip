@@ -3,6 +3,16 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada kayıt altına alınır.
 Format [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) esas alınır.
 
+## [1.5.14] — 2026-07-02
+
+### Eklendi
+- **Teslim Geri Al**: Yanlışlıkla teslim edilen evraklar artık geri alınabilir. "Teslimi Geri Al" butonu ile evrak "Bekliyor" durumuna döner ve teslim kayıtları silinir.
+
+### Düzeltildi
+- **Teslim Geçmişi TC/Tel**: TC kimlik numarası ve telefon bilgilerinin font boyutu büyütüldü.
+
+---
+
 ## [1.5.13] — 2026-07-02
 
 ### Düzeltildi
